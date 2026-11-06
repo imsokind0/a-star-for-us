@@ -67,7 +67,7 @@ const sampleMemories: Memory[] = [
   {
     id: 'c',
     title: '지금의 별',
-    subtitle: '앞으로도 함께 빛날 우리의 이야기',
+    subtitle: '앞으로도 우리의 소중한 추억으로 쌓이고 있어.',
     content: '지금 이 순간도 우리의 소중한 추억으로 쌓이고 있어.',
     image_url: null,
     created_at: ''
@@ -190,6 +190,7 @@ function App() {
   })
 
   const [uploading, setUploading] = useState(false)
+  const [deletingLetterId, setDeletingLetterId] = useState<string | null>(null)
 
   /* 유성우 미리보기 상태 */
   const [meteorPreview, setMeteorPreview] = useState(false)
@@ -238,14 +239,18 @@ function App() {
       return
     }
 
+    setAdminReady(false)
+
     supabase.rpc('is_site_admin').then(({ data, error }) => {
       if (error) {
         console.error('관리자 권한 확인 오류:', error)
         setIsAdmin(false)
+        setAdminReady(true)
         return
       }
 
       setIsAdmin(Boolean(data))
+      setAdminReady(true)
     })
   }, [session])
 
@@ -277,7 +282,13 @@ function App() {
         .from('mailbox')
         .select('*')
         .order('created_at', { ascending: false })
-        .then(({ data }) => {
+        .then(({ data, error }) => {
+          if (error) {
+            console.error('편지 불러오기 오류:', error)
+            setNotice('편지를 불러오지 못했어요.')
+            return
+          }
+
           if (data) setLetters(data)
         })
     }
@@ -487,17 +498,65 @@ function App() {
   const removeMemory = async (id: string) => {
     if (!confirm('이 추억을 삭제할까요?')) return
 
-    await supabase.from('memories').delete().eq('id', id)
+    const { error } = await supabase
+      .from('memories')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      setNotice('추억을 삭제하지 못했어요.')
+      return
+    }
 
     setMemories(v => v.filter(x => x.id !== id))
+    setNotice('추억을 삭제했어요.')
   }
 
   const removeVideo = async (id: string) => {
     if (!confirm('이 영상을 삭제할까요?')) return
 
-    await supabase.from('secret_videos').delete().eq('id', id)
+    const { error } = await supabase
+      .from('secret_videos')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      setNotice('영상을 삭제하지 못했어요.')
+      return
+    }
 
     setVideos(v => v.filter(x => x.id !== id))
+    setNotice('영상을 삭제했어요.')
+  }
+
+  /* 도착한 편지 삭제 */
+  const removeLetter = async (id: string) => {
+    if (!isAdmin || !hasSupabase || deletingLetterId) return
+
+    const confirmed = confirm(
+      '이 편지를 정말 삭제할까요?\n삭제하면 다시 복구할 수 없어요.'
+    )
+
+    if (!confirmed) return
+
+    setDeletingLetterId(id)
+    setNotice('')
+
+    const { error } = await supabase
+      .from('mailbox')
+      .delete()
+      .eq('id', id)
+
+    if (error) {
+      console.error('편지 삭제 오류:', error)
+      setNotice('편지를 삭제하지 못했어요. Supabase 삭제 권한을 확인해 주세요.')
+      setDeletingLetterId(null)
+      return
+    }
+
+    setLetters(current => current.filter(item => item.id !== id))
+    setNotice('편지를 삭제했어요.')
+    setDeletingLetterId(null)
   }
 
   const title =
@@ -857,9 +916,24 @@ function App() {
                       <article className="received-letter" key={l.id}>
                         <div className="received-head">
                           <strong>{l.nickname}</strong>
-                          <time>
-                            {new Date(l.created_at).toLocaleString('ko-KR')}
-                          </time>
+
+                          <div className="received-actions">
+                            <time>
+                              {new Date(l.created_at).toLocaleString('ko-KR')}
+                            </time>
+
+                            <button
+                              type="button"
+                              className="delete-letter-button"
+                              onClick={() => removeLetter(l.id)}
+                              disabled={deletingLetterId === l.id}
+                              title="편지 삭제"
+                              aria-label={`${l.nickname}의 편지 삭제`}
+                            >
+                              <Trash2 size={15}/>
+                              {deletingLetterId === l.id ? '삭제 중...' : '삭제'}
+                            </button>
+                          </div>
                         </div>
 
                         {questions.map((q, i) => {
