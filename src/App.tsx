@@ -621,7 +621,7 @@ function App() {
             <button className="home-card" onClick={() => nav('mailbox')}>
               <small>STARRY MAILBOX</small>
               <strong>별빛 우체통</strong>
-              <p>뺏실애기에게 1주년 편지를 띄워요</p>
+              <p>뽀실애기에게 1주년 편지를 띄워요</p>
               <ArrowRight/>
             </button>
 
@@ -665,7 +665,7 @@ function App() {
                 ? '꾸질이의 마음을 별빛 편지로 전해 주세요.'
                 : page === 'memories'
                   ? '하나하나 이어져 별자리가 된 순간들'
-                  : '뺏실애기가 꾸질이들에게 준비한 작은 선물.'}
+                  : '뽀실애기가 꾸질이들에게 준비한 작은 선물.'}
             </p>
           </div>
 
