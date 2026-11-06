@@ -14,11 +14,11 @@ const sampleMemories: Memory[] = [
   { id: 'c', title: '지금의 별', subtitle: '앞으로도 함께 빛날 우리의 이야기', content: '지금 이 순간도 우리의 소중한 추억으로 쌓이고 있어.', image_url: null, created_at: '' },
 ]
 const questions = [
-  '뺏실애기를 처음 알게 된 계기는 무엇인가요?',
-  '뺏실애기의 가장 좋아하는 매력은 무엇인가요?',
+  '뽀실애기를 처음 알게 된 계기는 무엇인가요?',
+  '가장 좋아하는 뽀실이의 매력/장점 무엇인가요?',
   '방송을 보면서 가장 기억에 남았던 순간은?',
-  '뺏실애기에게 해보고 싶었던 질문이 있나요?',
-  '앞으로 뺏실애기와 함께 만들고 가고 싶은 순간이나 기대하는 모습이 있나요?',
+  '뽀실애기에게 해보고 싶었던 질문이 있나요?',
+  '앞으로 뽀실애기와 함께 만들고 가고 싶은 순간이나 기대하는 모습이 있나요?',
 ]
 function youtubeId(url: string) { const m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/|shorts\/))([\w-]{11})/); return m?.[1] || '' }
 function Starscape() { return <div className="sky" aria-hidden="true"><div className="stars stars-one"/><div className="stars stars-two"/><div className="shooting s1"/><div className="shooting s2"/><div className="shooting s3"/><div className="shooting s4"/><div className="shooting s5"/></div> }
