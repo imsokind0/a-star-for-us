@@ -106,17 +106,18 @@ button {
 .shooting::after {
   content: '';
   position: absolute;
-  right: 0;
+  left: 1px;
   top: 50%;
   width: 100px;
   height: 1.5px;
   transform: translateY(-50%);
   background: linear-gradient(
     90deg,
-    transparent,
+    rgba(255, 240, 220, .95),
     rgba(255, 230, 245, .2),
-    rgba(255, 240, 220, .9)
+    transparent
   );
+  transform-origin: left center;
 }
 
 /* 별똥별 등장 위치 */
