@@ -510,7 +510,7 @@ function App() {
           : ''
 
   return (
-    <>
+    <div className={showMeteorShower ? 'celebration-mode' : ''}>
       <Starscape active={showMeteorShower}/>
 
       <div className="sparkle-corner">✦</div>
@@ -1109,7 +1109,7 @@ function App() {
       {notice && page !== 'mailbox' && page !== 'admin' && (
         <div className="toast">{notice}</div>
       )}
-    </>
+    </div>
   )
 }
 
