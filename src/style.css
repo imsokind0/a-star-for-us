@@ -110,7 +110,7 @@ button {
   top: 50%;
   width: 100px;
   height: 1.5px;
-  transform: translateY(-50%);
+  transform: translateY(-50%) rotate(-35deg);
   background: linear-gradient(
     90deg,
     rgba(255, 240, 220, .95),
@@ -1085,16 +1085,33 @@ button {
 
 .back-home {
   position: relative;
-  z-index: 1;
+  z-index: 3;
   display: flex;
   align-items: center;
-  gap: 6px;
-  margin: 0 auto 40px;
-  border: 0;
-  background: none;
-  color: #aa96b5;
-  font-size: 11px;
+  justify-content: center;
+  gap: 7px;
+  width: fit-content;
+  min-height: 40px;
+  padding: 10px 18px;
+  margin: 48px auto 55px;
+  border: 1px solid rgba(226, 197, 230, .25);
+  border-radius: 24px;
+  background: rgba(39, 25, 57, .85);
+  color: #d8b8d5;
+  font-size: 12px;
   cursor: pointer;
+  transition: background .2s, border-color .2s, transform .2s;
+}
+
+.back-home:hover {
+  background: rgba(230, 177, 210, .16);
+  border-color: rgba(230, 177, 210, .55);
+  transform: translateY(-2px);
+}
+
+.back-home:focus-visible {
+  outline: 2px solid #e6b1d2;
+  outline-offset: 4px;
 }
 
 /* 알림 */
@@ -1330,6 +1347,12 @@ button {
 
   .home-footer span {
     font-size: 8px;
+  }
+
+  .back-home {
+    margin: 38px auto 45px;
+    min-height: 42px;
+    padding: 11px 19px;
   }
 }
 
