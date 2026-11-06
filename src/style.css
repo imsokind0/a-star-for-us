@@ -1557,3 +1557,44 @@ body:has(.celebration-mode) {
     padding-bottom: 140px !important;
   }
 }
+
+.received-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.delete-letter-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 130, 160, .35);
+  border-radius: 8px;
+  background: rgba(160, 65, 95, .12);
+  color: #f0a6bd;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: .2s ease;
+}
+
+.delete-letter-button:hover:not(:disabled) {
+  background: rgba(190, 75, 110, .25);
+  border-color: rgba(255, 150, 180, .7);
+  color: #ffd2df;
+}
+
+.delete-letter-button:disabled {
+  opacity: .5;
+  cursor: wait;
+}
+
+@media (max-width: 600px) {
+  .received-actions {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 7px;
+  }
+}
