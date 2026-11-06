@@ -1,0 +1,8 @@
+<!doctype html><html lang="ko"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>페이지 이동 중</title></head><body><script>
+// GitHub Pages SPA fallback: preserve the deep link and return to the site root.
+const path = location.pathname;
+const parts = path.split('/').filter(Boolean);
+const base = location.hostname.endsWith('github.io') && parts.length ? '/' + parts[0] + '/' : '/';
+sessionStorage.setItem('star-for-us-redirect', path + location.search + location.hash);
+location.replace(base);
+</script></body></html>
