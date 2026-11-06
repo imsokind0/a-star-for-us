@@ -1,3 +1,4 @@
+
 import { useEffect, useMemo, useState, type FormEvent } from 'react'
 import { ArrowLeft, ArrowRight, LockKeyhole, Moon, Plus, Send, Sparkles, Star, Trash2, Upload, X, LogOut, Image as ImageIcon, Youtube, Pencil } from 'lucide-react'
 import { hasSupabase, supabase } from './lib/supabase'
@@ -483,7 +484,7 @@ function App() {
       </div>}
     </main>}
 
-    {page === 'admin' && <button className="back-home" onClick={() => nav('home')}><ArrowLeft size={14}/> 홈으로 돌아가기</button>}
+    {page !== 'home' && <button className="back-home" onClick={() => nav('home')}><ArrowLeft size={14}/> 홈으로 돌아가기</button>}
 
     {notice && page !== 'mailbox' && page !== 'admin' && <div className="toast">{notice}</div>}
   </>
