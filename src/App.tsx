@@ -668,7 +668,7 @@ function App() {
             </p>
           </div>
 
-          {page === 'quiz' && <StarQuiz isAdmin={isAdmin}/>}
+        {page === 'quiz' && <StarQuiz isAdmin={false}/>}
 
           {page === 'mailbox' && (
             <form className="letter-form" onSubmit={submitLetter}>
