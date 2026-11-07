@@ -15,6 +15,7 @@ import {
 } from 'lucide-react'
 import { hasSupabase, supabase } from './lib/supabase'
 import DrawingCanvas from './DrawingCanvas'
+import StarEffects from './StarEffects'
 
 type Page = 'home' | 'mailbox' | 'memories' | 'secret' | 'admin'
 
@@ -577,6 +578,9 @@ function App() {
 
   return (
     <div className={showMeteorShower ? 'celebration-mode' : ''}>
+      {/* 마우스 별가루 + 클릭 별 폭발 효과 */}
+      <StarEffects />
+
       <Starscape active={showMeteorShower}/>
 
       <div className="sparkle-corner">✦</div>
