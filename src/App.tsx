@@ -170,6 +170,7 @@ function App() {
   const [nickname, setNickname] = useState('')
   const [answers, setAnswers] = useState(['', '', '', '', ''])
   const [letter, setLetter] = useState('')
+  const [drawingData, setDrawingData] = useState('')
 
   const [loginEmail, setLoginEmail] = useState('')
   const [loginPassword, setLoginPassword] = useState('')
