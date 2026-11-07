@@ -1,3 +1,4 @@
+
 import { useEffect, useState, type FormEvent } from 'react'
 import {
   ArrowLeft,
@@ -668,7 +669,8 @@ function App() {
             </p>
           </div>
 
-        {page === 'quiz' && <StarQuiz isAdmin={false}/>}
+          {/* 일반 퀴즈: 관리자 권한을 전달하지 않음 */}
+          {page === 'quiz' && <StarQuiz />}
 
           {page === 'mailbox' && (
             <form className="letter-form" onSubmit={submitLetter}>
@@ -841,7 +843,7 @@ function App() {
 
               {!hasSupabase && <p className="notice">Supabase 연결을 설정해야 관리 기능을 사용할 수 있어요.</p>}
 
-              {/* STAR QUIZ ADMIN: 관리자 퀴즈 컴포넌트 연결 */}
+              {/* 관리자 퀴즈 전용 컴포넌트 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
