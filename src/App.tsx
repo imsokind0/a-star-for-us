@@ -91,7 +91,6 @@ function youtubeId(url: string) {
   return m?.[1] || ''
 }
 
-/* 유성우 배경 */
 function Starscape({ active }: { active: boolean }) {
   const meteorStyle = {
     animationDuration: active ? '1.5s' : '5s'
@@ -102,14 +101,8 @@ function Starscape({ active }: { active: boolean }) {
       className={`sky ${active ? 'anniversary-shower' : ''}`}
       aria-hidden="true"
     >
-      <div
-        className="stars stars-one"
-        style={{ animationDuration: active ? '1.3s' : '5s' }}
-      />
-      <div
-        className="stars stars-two"
-        style={{ animationDuration: active ? '1.7s' : '7s' }}
-      />
+      <div className="stars stars-one" style={{ animationDuration: active ? '1.3s' : '5s' }}/>
+      <div className="stars stars-two" style={{ animationDuration: active ? '1.7s' : '7s' }}/>
       <div className="shooting s1" style={meteorStyle}/>
       <div className="shooting s2" style={meteorStyle}/>
       <div className="shooting s3" style={meteorStyle}/>
@@ -200,11 +193,8 @@ function App() {
 
   const [uploading, setUploading] = useState(false)
   const [deletingLetterId, setDeletingLetterId] = useState<string | null>(null)
-
-  /* 유성우 미리보기 상태 */
   const [meteorPreview, setMeteorPreview] = useState(false)
 
-  /* 실제 기념일 도달 여부 */
   const [anniversaryStarted, setAnniversaryStarted] = useState(
     () => Date.now() >= anniversary.getTime()
   )
@@ -215,13 +205,10 @@ function App() {
     }
 
     checkAnniversary()
-
     const timer = setInterval(checkAnniversary, 1000)
-
     return () => clearInterval(timer)
   }, [])
 
-  /* 미리보기 또는 실제 기념일이면 유성우 실행 */
   const showMeteorShower = meteorPreview || anniversaryStarted
 
   useEffect(() => {
@@ -303,17 +290,20 @@ function App() {
     }
   }, [page, session])
 
+  /* 페이지 이동 */
   const nav = (p: Page) => {
     setPage(p)
     setSelected(null)
     setNotice('')
 
-    const base = location.pathname.includes('/admin')
-      ? location.pathname.slice(0, location.pathname.lastIndexOf('/'))
-      : location.pathname.replace(/\/$/, '')
+    const pathname = location.pathname.replace(/\/$/, '')
+    const base =
+      pathname.endsWith('/admin') || pathname.endsWith('/quiz')
+        ? pathname.slice(0, pathname.lastIndexOf('/'))
+        : pathname
 
     if (p === 'admin') {
-      history.pushState({}, '', `${base}/admin` || '/admin')
+      history.pushState({}, '', `${base}/admin`)
     } else if (p === 'quiz') {
       history.pushState({}, '', `${base}/quiz`)
     } else {
@@ -321,7 +311,6 @@ function App() {
     }
   }
 
-  /* 별빛 편지 저장 */
   const submitLetter = async (e: FormEvent) => {
     e.preventDefault()
 
@@ -436,7 +425,6 @@ function App() {
       .order('created_at')
 
     if (data) setMemories(data)
-
     setNotice('추억을 저장했어요 ✦')
   }
 
@@ -477,7 +465,6 @@ function App() {
       .order('created_at', { ascending: false })
 
     if (data) setVideos(data)
-
     setNotice('시크릿 커버를 업데이트했어요 ✦')
   }
 
@@ -485,7 +472,6 @@ function App() {
     if (!file || !hasSupabase) return
 
     setUploading(true)
-
     const path = `${Date.now()}-${file.name.replace(/[^\w.-]/g, '_')}`
 
     const { error } = await supabase.storage
@@ -544,7 +530,6 @@ function App() {
     setNotice('영상을 삭제했어요.')
   }
 
-  /* 도착한 편지 삭제 */
   const removeLetter = async (id: string) => {
     if (!isAdmin || !hasSupabase || deletingLetterId) return
 
@@ -587,39 +572,24 @@ function App() {
 
   return (
     <div className={showMeteorShower ? 'celebration-mode' : ''}>
-      {/* 마우스 별가루 + 클릭 별 폭발 효과 */}
-      <StarEffects />
-
+      <StarEffects/>
       <Starscape active={showMeteorShower}/>
-
       <div className="sparkle-corner">✦</div>
 
       <header className="topbar">
-        <button
-          className={page === 'mailbox' ? 'active' : ''}
-          onClick={() => nav('mailbox')}
-        >
+        <button className={page === 'mailbox' ? 'active' : ''} onClick={() => nav('mailbox')}>
           별빛 우체통
         </button>
 
-        <button
-          className={page === 'memories' ? 'active' : ''}
-          onClick={() => nav('memories')}
-        >
+        <button className={page === 'memories' ? 'active' : ''} onClick={() => nav('memories')}>
           추억
         </button>
 
-        <button
-          className={page === 'secret' ? 'active' : ''}
-          onClick={() => nav('secret')}
-        >
+        <button className={page === 'secret' ? 'active' : ''} onClick={() => nav('secret')}>
           SECRET COVER✧
         </button>
 
-        <button
-          className={page === 'quiz' ? 'active' : ''}
-          onClick={() => nav('quiz')}
-        >
+        <button className={page === 'quiz' ? 'active' : ''} onClick={() => nav('quiz')}>
           STAR QUIZ
         </button>
       </header>
@@ -628,19 +598,10 @@ function App() {
         <main className="home page-wrap">
           <div className="hero">
             <Crescent large/>
-
-            <div className="eyebrow couple">
-              BOOSIL-AEGI &amp; KKUJIL · ONE YEAR TOGETHER
-            </div>
-
-            <h1>
-              A STAR <em>FOR</em> US <span>✦</span>
-            </h1>
-
+            <div className="eyebrow couple">BOOSIL-AEGI &amp; KKUJIL · ONE YEAR TOGETHER</div>
+            <h1>A STAR <em>FOR</em> US <span>✦</span></h1>
             <p className="hero-sub">우리의 첫 번째 궤도 ♡</p>
-
             <div className="ornaments">✧　✦</div>
-
             <Countdown/>
           </div>
 
@@ -707,17 +668,13 @@ function App() {
             </p>
           </div>
 
-          {/* STAR QUIZ */}
-          {page === 'quiz' && (
-            <StarQuiz isAdmin={isAdmin}/>
-          )}
+          {page === 'quiz' && <StarQuiz isAdmin={isAdmin}/>}
 
           {page === 'mailbox' && (
             <form className="letter-form" onSubmit={submitLetter}>
               <div className="form-card">
                 <label>닉네임 <b>*</b></label>
                 <small>뽀실애기가 알아볼 수 있는 닉네임</small>
-
                 <input
                   value={nickname}
                   onChange={e => setNickname(e.target.value)}
@@ -729,19 +686,11 @@ function App() {
 
               {questions.map((q, i) => (
                 <div className="form-card" key={q}>
-                  <label>
-                    <span className="number">0{i + 1}</span> {q} <i>(선택)</i>
-                  </label>
-
+                  <label><span className="number">0{i + 1}</span> {q} <i>(선택)</i></label>
                   <small>자유롭게 적어주세요.</small>
-
                   <textarea
                     value={answers[i]}
-                    onChange={e =>
-                      setAnswers(a =>
-                        a.map((v, j) => j === i ? e.target.value : v)
-                      )
-                    }
+                    onChange={e => setAnswers(a => a.map((v, j) => j === i ? e.target.value : v))}
                     placeholder="편하게 마음을 적어주세요."
                     rows={3}
                   />
@@ -749,12 +698,8 @@ function App() {
               ))}
 
               <div className="form-card">
-                <label>
-                  <span className="number">06</span> 1주년을 맞아 뽀실애기에게 전하고 싶은 편지 <b>*</b>
-                </label>
-
+                <label><span className="number">06</span> 1주년을 맞아 뽀실애기에게 전하고 싶은 편지 <b>*</b></label>
                 <small>사랑하는 뽀실애기에게...</small>
-
                 <textarea
                   className="long-letter"
                   value={letter}
@@ -764,37 +709,23 @@ function App() {
                   rows={5}
                 />
 
-                {/* 편지 그림판 */}
-                <DrawingCanvas
-                  onSave={(data) => {
-                    setDrawingData(data)
-                    setNotice('그림이 저장되었어요!')
-                  }}
-                />
+                <DrawingCanvas onSave={data => {
+                  setDrawingData(data)
+                  setNotice('그림이 저장되었어요!')
+                }}/>
 
-                {/* 저장한 그림 미리보기 */}
                 {drawingData && (
                   <div className="drawing-preview">
                     <p>편지에 함께 보낼 그림 ✦</p>
-                    <img
-                      src={drawingData}
-                      alt="편지 그림 미리보기"
-                    />
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() => setDrawingData('')}
-                    >
+                    <img src={drawingData} alt="편지 그림 미리보기"/>
+                    <button type="button" className="text-button" onClick={() => setDrawingData('')}>
                       그림 첨부 취소
                     </button>
                   </div>
                 )}
               </div>
 
-              <button className="pink-button" type="submit">
-                별빛 편지 띄우기 <Sparkles size={14}/>
-              </button>
-
+              <button className="pink-button" type="submit">별빛 편지 띄우기 <Sparkles size={14}/></button>
               {notice && <p className="notice">{notice}</p>}
             </form>
           )}
@@ -802,17 +733,10 @@ function App() {
           {page === 'memories' && (
             <div className="memory-grid">
               {memories.map(m => (
-                <button
-                  className="memory-card"
-                  key={m.id}
-                  onClick={() => setSelected(m)}
-                >
+                <button className="memory-card" key={m.id} onClick={() => setSelected(m)}>
                   <div className="memory-art">
-                    {m.image_url
-                      ? <img src={m.image_url} alt={m.title}/>
-                      : <span>✧</span>}
+                    {m.image_url ? <img src={m.image_url} alt={m.title}/> : <span>✧</span>}
                   </div>
-
                   <div className="memory-copy">
                     <strong>{m.title}</strong>
                     <p>{m.subtitle}</p>
@@ -842,9 +766,7 @@ function App() {
                           allowFullScreen
                         />
                       </div>
-
                       <h3>{v.title}</h3>
-
                       {v.description && <p>{v.description}</p>}
                     </article>
                   ))}
@@ -854,25 +776,10 @@ function App() {
           )}
 
           {selected && (
-            <div
-              className="modal-backdrop"
-              onClick={() => setSelected(null)}
-            >
-              <div
-                className="memory-modal"
-                onClick={e => e.stopPropagation()}
-              >
-                <button
-                  className="close"
-                  onClick={() => setSelected(null)}
-                >
-                  <X/>
-                </button>
-
-                {selected.image_url && (
-                  <img src={selected.image_url} alt={selected.title}/>
-                )}
-
+            <div className="modal-backdrop" onClick={() => setSelected(null)}>
+              <div className="memory-modal" onClick={e => e.stopPropagation()}>
+                <button className="close" onClick={() => setSelected(null)}><X/></button>
+                {selected.image_url && <img src={selected.image_url} alt={selected.title}/>}
                 <div className="eyebrow">A MOMENT TO REMEMBER</div>
                 <h3>{selected.title}</h3>
                 <p className="modal-subtitle">{selected.subtitle}</p>
@@ -896,31 +803,11 @@ function App() {
               <div className="lock-icon"><LockKeyhole/></div>
               <h3>관리자 로그인</h3>
               <p>허가된 관리자만 입장할 수 있어요.</p>
-
               <label>아이디 (이메일)</label>
-
-              <input
-                type="email"
-                value={loginEmail}
-                onChange={e => setLoginEmail(e.target.value)}
-                placeholder="admin@example.com"
-                required
-              />
-
+              <input type="email" value={loginEmail} onChange={e => setLoginEmail(e.target.value)} placeholder="admin@example.com" required/>
               <label>비밀번호</label>
-
-              <input
-                type="password"
-                value={loginPassword}
-                onChange={e => setLoginPassword(e.target.value)}
-                placeholder="비밀번호를 입력해 주세요"
-                required
-              />
-
-              <button className="pink-button">
-                로그인 <ArrowRight size={15}/>
-              </button>
-
+              <input type="password" value={loginPassword} onChange={e => setLoginPassword(e.target.value)} placeholder="비밀번호를 입력해 주세요" required/>
+              <button className="pink-button">로그인 <ArrowRight size={15}/></button>
               {notice && <p className="notice">{notice}</p>}
             </form>
           ) : !adminReady ? (
@@ -930,9 +817,7 @@ function App() {
               <div className="lock-icon"><LockKeyhole/></div>
               <h3>접근 권한이 없어요</h3>
               <p>이 계정은 관리자 목록에 등록되어 있지 않습니다.</p>
-              <button className="pink-button" onClick={logout}>
-                로그아웃
-              </button>
+              <button className="pink-button" onClick={logout}>로그아웃</button>
             </div>
           ) : (
             <div className="admin-content">
@@ -945,31 +830,17 @@ function App() {
                       : '관리자 계정으로 로그인되어 있어요.'}
                 </p>
 
-                <button
-                  className="outline-button"
-                  type="button"
-                  onClick={() => setMeteorPreview(v => !v)}
-                  aria-pressed={meteorPreview}
-                >
-                  <Sparkles size={14}/>
-                  {meteorPreview ? '미리보기 종료' : '유성우 미리보기'}
+                <button className="outline-button" type="button" onClick={() => setMeteorPreview(v => !v)} aria-pressed={meteorPreview}>
+                  <Sparkles size={14}/>{meteorPreview ? '미리보기 종료' : '유성우 미리보기'}
                 </button>
 
-                <button
-                  className="outline-button"
-                  onClick={logout}
-                >
+                <button className="outline-button" onClick={logout}>
                   <LogOut size={14}/> 로그아웃
                 </button>
               </div>
 
-              {!hasSupabase && (
-                <p className="notice">
-                  Supabase 연결을 설정해야 관리 기능을 사용할 수 있어요.
-                </p>
-              )}
+              {!hasSupabase && <p className="notice">Supabase 연결을 설정해야 관리 기능을 사용할 수 있어요.</p>}
 
-              {/* STAR QUIZ 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
@@ -977,11 +848,9 @@ function App() {
                     <h3>별빛 퀴즈 관리</h3>
                   </div>
                 </div>
-
                 <StarQuiz isAdmin={true}/>
               </section>
 
-              {/* 도착한 편지 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
@@ -998,12 +867,8 @@ function App() {
                       <article className="received-letter" key={l.id}>
                         <div className="received-head">
                           <strong>{l.nickname}</strong>
-
                           <div className="received-actions">
-                            <time>
-                              {new Date(l.created_at).toLocaleString('ko-KR')}
-                            </time>
-
+                            <time>{new Date(l.created_at).toLocaleString('ko-KR')}</time>
                             <button
                               type="button"
                               className="delete-letter-button"
@@ -1020,28 +885,15 @@ function App() {
 
                         {questions.map((q, i) => {
                           const val = [l.q1, l.q2, l.q3, l.q4, l.q5][i]
-
-                          return val ? (
-                            <div className="answer" key={q}>
-                              <b>{q}</b>
-                              <p>{val}</p>
-                            </div>
-                          ) : null
+                          return val ? <div className="answer" key={q}><b>{q}</b><p>{val}</p></div> : null
                         })}
 
-                        <div className="answer final-answer">
-                          <b>1주년 편지</b>
-                          <p>{l.letter}</p>
-                        </div>
+                        <div className="answer final-answer"><b>1주년 편지</b><p>{l.letter}</p></div>
 
-                        {/* 꾸질이가 그린 그림 표시 */}
                         {l.drawing_data && (
                           <div className="answer letter-drawing">
                             <b>꾸질이가 그린 그림</b>
-                            <img
-                              src={l.drawing_data}
-                              alt={`${l.nickname}의 편지 그림`}
-                            />
+                            <img src={l.drawing_data} alt={`${l.nickname}의 편지 그림`}/>
                           </div>
                         )}
                       </article>
@@ -1050,91 +902,30 @@ function App() {
                 )}
               </section>
 
-              {/* 추억 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
-                  <div>
-                    <div className="eyebrow">MEMORIES</div>
-                    <h3>추억 관리</h3>
-                  </div>
+                  <div><div className="eyebrow">MEMORIES</div><h3>추억 관리</h3></div>
                 </div>
 
                 <form className="admin-form" onSubmit={saveMemory}>
-                  <input
-                    value={memoryForm.title}
-                    onChange={e =>
-                      setMemoryForm(v => ({ ...v, title: e.target.value }))
-                    }
-                    placeholder="추억 제목"
-                    required
-                  />
-
-                  <input
-                    value={memoryForm.subtitle}
-                    onChange={e =>
-                      setMemoryForm(v => ({ ...v, subtitle: e.target.value }))
-                    }
-                    placeholder="짧은 설명"
-                  />
-
-                  <textarea
-                    value={memoryForm.content}
-                    onChange={e =>
-                      setMemoryForm(v => ({ ...v, content: e.target.value }))
-                    }
-                    placeholder="추억의 자세한 내용"
-                    rows={3}
-                  />
+                  <input value={memoryForm.title} onChange={e => setMemoryForm(v => ({ ...v, title: e.target.value }))} placeholder="추억 제목" required/>
+                  <input value={memoryForm.subtitle} onChange={e => setMemoryForm(v => ({ ...v, subtitle: e.target.value }))} placeholder="짧은 설명"/>
+                  <textarea value={memoryForm.content} onChange={e => setMemoryForm(v => ({ ...v, content: e.target.value }))} placeholder="추억의 자세한 내용" rows={3}/>
 
                   <div className="upload-row">
                     <label className="upload-button">
-                      <Upload size={15}/>
-                      {uploading ? '업로드 중...' : '이미지 업로드'}
-
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={e => uploadImage(e.target.files?.[0])}
-                        disabled={uploading}
-                      />
+                      <Upload size={15}/>{uploading ? '업로드 중...' : '이미지 업로드'}
+                      <input type="file" accept="image/*" onChange={e => uploadImage(e.target.files?.[0])} disabled={uploading}/>
                     </label>
-
-                    <input
-                      value={memoryForm.image_url}
-                      onChange={e =>
-                        setMemoryForm(v => ({ ...v, image_url: e.target.value }))
-                      }
-                      placeholder="또는 이미지 URL 입력"
-                    />
+                    <input value={memoryForm.image_url} onChange={e => setMemoryForm(v => ({ ...v, image_url: e.target.value }))} placeholder="또는 이미지 URL 입력"/>
                   </div>
 
-                  {memoryForm.image_url && (
-                    <img
-                      className="upload-preview"
-                      src={memoryForm.image_url}
-                      alt="업로드 미리보기"
-                    />
-                  )}
+                  {memoryForm.image_url && <img className="upload-preview" src={memoryForm.image_url} alt="업로드 미리보기"/>}
 
-                  <button className="pink-button">
-                    <Plus size={15}/>
-                    {memoryForm.id ? '수정 저장' : '추억 추가'}
-                  </button>
+                  <button className="pink-button"><Plus size={15}/>{memoryForm.id ? '수정 저장' : '추억 추가'}</button>
 
                   {memoryForm.id && (
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() =>
-                        setMemoryForm({
-                          id: '',
-                          title: '',
-                          subtitle: '',
-                          content: '',
-                          image_url: ''
-                        })
-                      }
-                    >
+                    <button type="button" className="text-button" onClick={() => setMemoryForm({ id: '', title: '', subtitle: '', content: '', image_url: '' })}>
                       수정 취소
                     </button>
                   )}
@@ -1143,92 +934,28 @@ function App() {
                 <div className="manage-list">
                   {memories.map(m => (
                     <div className="manage-row" key={m.id}>
-                      {m.image_url
-                        ? <img src={m.image_url} alt=""/>
-                        : <div className="mini-art">✧</div>}
-
-                      <div>
-                        <b>{m.title}</b>
-                        <small>{m.subtitle}</small>
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          setMemoryForm({
-                            id: m.id,
-                            title: m.title,
-                            subtitle: m.subtitle || '',
-                            content: m.content || '',
-                            image_url: m.image_url || ''
-                          })
-                        }
-                      >
-                        <Pencil size={15}/>
-                      </button>
-
-                      <button onClick={() => removeMemory(m.id)}>
-                        <Trash2 size={15}/>
-                      </button>
+                      {m.image_url ? <img src={m.image_url} alt=""/> : <div className="mini-art">✧</div>}
+                      <div><b>{m.title}</b><small>{m.subtitle}</small></div>
+                      <button onClick={() => setMemoryForm({ id: m.id, title: m.title, subtitle: m.subtitle || '', content: m.content || '', image_url: m.image_url || '' })}><Pencil size={15}/></button>
+                      <button onClick={() => removeMemory(m.id)}><Trash2 size={15}/></button>
                     </div>
                   ))}
                 </div>
               </section>
 
-              {/* 시크릿 영상 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
-                  <div>
-                    <div className="eyebrow">SECRET COVER</div>
-                    <h3>시크릿 영상 관리</h3>
-                  </div>
+                  <div><div className="eyebrow">SECRET COVER</div><h3>시크릿 영상 관리</h3></div>
                 </div>
 
                 <form className="admin-form" onSubmit={saveVideo}>
-                  <input
-                    value={videoForm.title}
-                    onChange={e =>
-                      setVideoForm(v => ({ ...v, title: e.target.value }))
-                    }
-                    placeholder="영상 제목"
-                    required
-                  />
-
-                  <input
-                    value={videoForm.youtube_url}
-                    onChange={e =>
-                      setVideoForm(v => ({ ...v, youtube_url: e.target.value }))
-                    }
-                    placeholder="유튜브 링크 (https://youtu.be/...)"
-                    required
-                  />
-
-                  <textarea
-                    value={videoForm.description}
-                    onChange={e =>
-                      setVideoForm(v => ({ ...v, description: e.target.value }))
-                    }
-                    placeholder="영상 설명 (선택)"
-                    rows={2}
-                  />
-
-                  <button className="pink-button">
-                    <Plus size={15}/>
-                    {videoForm.id ? '영상 수정' : '영상 등록'}
-                  </button>
+                  <input value={videoForm.title} onChange={e => setVideoForm(v => ({ ...v, title: e.target.value }))} placeholder="영상 제목" required/>
+                  <input value={videoForm.youtube_url} onChange={e => setVideoForm(v => ({ ...v, youtube_url: e.target.value }))} placeholder="유튜브 링크 (https://youtu.be/...)" required/>
+                  <textarea value={videoForm.description} onChange={e => setVideoForm(v => ({ ...v, description: e.target.value }))} placeholder="영상 설명 (선택)" rows={2}/>
+                  <button className="pink-button"><Plus size={15}/>{videoForm.id ? '영상 수정' : '영상 등록'}</button>
 
                   {videoForm.id && (
-                    <button
-                      type="button"
-                      className="text-button"
-                      onClick={() =>
-                        setVideoForm({
-                          id: '',
-                          title: '',
-                          youtube_url: '',
-                          description: ''
-                        })
-                      }
-                    >
+                    <button type="button" className="text-button" onClick={() => setVideoForm({ id: '', title: '', youtube_url: '', description: '' })}>
                       수정 취소
                     </button>
                   )}
@@ -1238,28 +965,9 @@ function App() {
                   {videos.map(v => (
                     <div className="manage-row" key={v.id}>
                       <div className="mini-art"><Youtube/></div>
-
-                      <div>
-                        <b>{v.title}</b>
-                        <small>{v.youtube_url}</small>
-                      </div>
-
-                      <button
-                        onClick={() =>
-                          setVideoForm({
-                            id: v.id,
-                            title: v.title,
-                            youtube_url: v.youtube_url,
-                            description: v.description || ''
-                          })
-                        }
-                      >
-                        <Pencil size={15}/>
-                      </button>
-
-                      <button onClick={() => removeVideo(v.id)}>
-                        <Trash2 size={15}/>
-                      </button>
+                      <div><b>{v.title}</b><small>{v.youtube_url}</small></div>
+                      <button onClick={() => setVideoForm({ id: v.id, title: v.title, youtube_url: v.youtube_url, description: v.description || '' })}><Pencil size={15}/></button>
+                      <button onClick={() => removeVideo(v.id)}><Trash2 size={15}/></button>
                     </div>
                   ))}
                 </div>
