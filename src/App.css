@@ -1677,3 +1677,613 @@
     flex-direction: column;
   }
 }
+
+/* =========================================
+   A STAR FOR US · QUIZ ADMIN REDESIGN
+   ========================================= */
+
+.sqa-admin {
+  width: min(1100px, 100%);
+  margin: 0 auto;
+  padding: 36px 24px 80px;
+  color: #f8efff;
+  font-family: inherit;
+}
+
+/* 헤더 */
+.sqa-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 30px;
+}
+
+.sqa-heading-icon {
+  display: grid;
+  place-items: center;
+  width: 58px;
+  height: 58px;
+  border-radius: 20px;
+  color: #f4c9ff;
+  background: linear-gradient(145deg, #55366d, #2a183f);
+  border: 1px solid #b58bda55;
+  box-shadow: 0 0 28px #bb75ff20;
+}
+
+.sqa-eyebrow {
+  color: #d6a8f3;
+  font-size: 11px;
+  letter-spacing: 3px;
+  margin-bottom: 7px;
+}
+
+.sqa-heading h1,
+.sqa-heading h2 {
+  margin: 0;
+  font-size: clamp(24px, 4vw, 34px);
+  letter-spacing: -1px;
+  font-weight: 700;
+}
+
+.sqa-summary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+  margin-bottom: 26px;
+}
+
+.sqa-summary-card {
+  padding: 22px;
+  border-radius: 20px;
+  background: linear-gradient(145deg, #251735cc, #171022dd);
+  border: 1px solid #b99ad51c;
+  box-shadow: 0 10px 35px #00000015;
+}
+
+.sqa-summary-card > * {
+  margin: 0;
+}
+
+.sqa-summary-card strong {
+  display: block;
+  margin-top: 10px;
+  font-size: 28px;
+  color: #f0c8ff;
+}
+
+.sqa-summary-card span {
+  font-size: 12px;
+  color: #bca9cf;
+}
+
+/* 공통 패널 */
+.sqa-panel {
+  padding: 26px;
+  margin-bottom: 24px;
+  border-radius: 26px;
+  background: linear-gradient(
+    145deg,
+    rgba(39, 26, 58, .94),
+    rgba(23, 15, 37, .96)
+  );
+  border: 1px solid rgba(201, 160, 239, .15);
+  box-shadow: 0 18px 50px #00000020;
+}
+
+.sqa-panel-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.sqa-panel-heading h2,
+.sqa-panel-heading h3 {
+  margin: 0;
+  font-size: 20px;
+}
+
+.sqa-heading-badge {
+  padding: 7px 12px;
+  border-radius: 999px;
+  background: #b77bdf18;
+  border: 1px solid #c69ae52b;
+  color: #dcb9f5;
+  font-size: 12px;
+}
+
+/* 입력 폼 */
+.sqa-form {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.sqa-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.sqa-label-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sqa-label-row label,
+.sqa-label-row > span,
+.sqa-label-row > strong,
+.sqa-label-row > div {
+  color: #e8d8f5;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sqa-form input:not([type="radio"]):not([type="checkbox"]),
+.sqa-form textarea,
+.sqa-form select {
+  box-sizing: border-box;
+  width: 100%;
+  min-width: 0;
+  padding: 15px 17px;
+  border-radius: 14px;
+  border: 1px solid #bba0d52b;
+  outline: none;
+  color: #f8efff;
+  background: #100b1dcc;
+  font: inherit;
+  font-size: 14px;
+  transition: border-color .2s, box-shadow .2s, background .2s;
+}
+
+.sqa-form input:not([type="radio"]):not([type="checkbox"]):focus,
+.sqa-form textarea:focus,
+.sqa-form select:focus {
+  border-color: #c99bea88;
+  background: #160e24;
+  box-shadow: 0 0 0 3px #b77bdf12;
+}
+
+.sqa-form textarea {
+  min-height: 110px;
+  resize: vertical;
+  line-height: 1.7;
+}
+
+.sqa-form input::placeholder,
+.sqa-form textarea::placeholder {
+  color: #776487;
+}
+
+.sqa-form select {
+  cursor: pointer;
+}
+
+/* 선택지 카드 */
+.sqa-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.sqa-option {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  padding: 16px;
+  border-radius: 18px;
+  background: #120c1dcc;
+  border: 1px solid #bda0d523;
+  transition: border-color .2s, background .2s;
+}
+
+.sqa-option:focus-within {
+  border-color: #d1a0ef88;
+  background: #1b1029;
+}
+
+.sqa-option-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.sqa-option-letter {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex-shrink: 0;
+  border-radius: 10px;
+  background: #342044;
+  color: #e5baff;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.sqa-option input:not([type="radio"]) {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 12px 13px;
+  border-radius: 11px;
+  border: 1px solid #bba0d51f;
+  background: #0e0918;
+  color: #f8efff;
+  font: inherit;
+  font-size: 13px;
+}
+
+.sqa-option-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  color: #bda9d1;
+  font-size: 12px;
+}
+
+.sqa-option input[type="radio"] {
+  appearance: none;
+  -webkit-appearance: none;
+  flex: 0 0 16px;
+  width: 16px;
+  height: 16px;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #8f6ba8;
+  border-radius: 50%;
+  background: transparent;
+  cursor: pointer;
+}
+
+.sqa-option input[type="radio"]:checked {
+  border: 5px solid #d8a6f5;
+  background: #fff;
+  box-shadow: 0 0 12px #ce91ff55;
+}
+
+.sqa-correct-chip {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #d4a0f51b;
+  color: #e6baff;
+  font-size: 10px;
+}
+
+/* 공개 / 정답 공개 설정 */
+.sqa-setting-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 17px;
+  border-radius: 17px;
+  background: #100a19aa;
+  border: 1px solid #bda0d51a;
+}
+
+.sqa-switch-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  cursor: pointer;
+}
+
+.sqa-switch-icon {
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 12px;
+  background: #352047;
+  color: #d6a6f2;
+}
+
+.sqa-switch-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.sqa-switch-text strong {
+  display: block;
+  font-size: 13px;
+  color: #eadcf5;
+}
+
+.sqa-switch-text small {
+  display: block;
+  margin-top: 4px;
+  color: #a18bb5;
+  font-size: 11px;
+}
+
+.sqa-switch-ui {
+  position: relative;
+  width: 42px;
+  height: 24px;
+  flex-shrink: 0;
+  border-radius: 999px;
+  background: #40314f;
+  transition: background .2s;
+}
+
+.sqa-switch-ui::after {
+  content: "";
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #c4b0d4;
+  transition: transform .2s, background .2s;
+}
+
+/* 버튼 */
+.sqa-form-actions,
+.sqa-question-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.sqa-admin button {
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform .18s, background .18s, border-color .18s;
+}
+
+.sqa-admin button:hover {
+  transform: translateY(-1px);
+}
+
+.sqa-form-actions button {
+  padding: 13px 20px;
+  border-radius: 13px;
+  border: 1px solid #c69ae533;
+  background: #352047;
+  color: #e9d3fa;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.sqa-form-actions button[type="submit"] {
+  border: 1px solid #d7a4f555;
+  background: linear-gradient(135deg, #8c54b4, #62418c);
+  color: white;
+  box-shadow: 0 7px 22px #8c54b425;
+}
+
+.sqa-form-actions button:hover {
+  filter: brightness(1.12);
+}
+
+.sqa-notice {
+  padding: 13px 16px;
+  border-radius: 13px;
+  background: #a875d51a;
+  border: 1px solid #bd8fe52a;
+  color: #e7c7ff;
+  font-size: 13px;
+}
+
+/* 등록된 문제 */
+.sqa-count {
+  color: #bba5cf;
+  font-size: 12px;
+}
+
+.sqa-question-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.sqa-question-card {
+  padding: 20px;
+  border-radius: 20px;
+  background: #130d20cc;
+  border: 1px solid #b99bd51f;
+  transition: border-color .2s;
+}
+
+.sqa-question-card:hover {
+  border-color: #c69ae533;
+}
+
+.sqa-question-card-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+}
+
+.sqa-question-number {
+  color: #c69ae5;
+  font-size: 11px;
+  letter-spacing: 1px;
+  margin-bottom: 8px;
+}
+
+.sqa-question-card h3,
+.sqa-question-card p {
+  margin: 0;
+  line-height: 1.65;
+  word-break: break-word;
+}
+
+.sqa-question-card h3 {
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.sqa-statuses {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.sqa-statuses span {
+  padding: 5px 9px;
+  border-radius: 999px;
+  background: #352047;
+  color: #d7b4f1;
+  font-size: 10px;
+}
+
+.sqa-list-options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+  margin-top: 16px;
+}
+
+.sqa-list-option {
+  padding: 11px 13px;
+  border-radius: 12px;
+  background: #20152e;
+  border: 1px solid #b99bd515;
+  color: #cdbbdc;
+  font-size: 12px;
+  line-height: 1.5;
+  word-break: break-word;
+}
+
+.sqa-list-explanation {
+  margin-top: 12px;
+  padding: 13px;
+  border-radius: 12px;
+  background: #261735;
+  color: #bfa9d2;
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.sqa-question-actions {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid #b99bd515;
+}
+
+.sqa-question-actions button {
+  padding: 9px 12px;
+  border-radius: 10px;
+  border: 1px solid #b99bd525;
+  background: #271936;
+  color: #d9c0ee;
+  font-size: 11px;
+}
+
+.sqa-question-actions button:hover {
+  background: #39234e;
+}
+
+/* 통계 */
+.sqa-stats-area {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 20px;
+}
+
+.sqa-vote-stat {
+  padding: 16px;
+  border-radius: 16px;
+  background: #1a1027;
+  border: 1px solid #b99bd51b;
+}
+
+.sqa-vote-stat-top {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  color: #e4d3f2;
+  font-size: 12px;
+  margin-bottom: 10px;
+}
+
+.sqa-vote-bar {
+  height: 7px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #342341;
+}
+
+.sqa-vote-bar > div {
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #a66bd0, #e2a8f8);
+}
+
+.sqa-participant-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 14px;
+}
+
+.sqa-participant {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 12px;
+  background: #21152e;
+  color: #d9c8e9;
+  font-size: 12px;
+}
+
+/* 모바일 */
+@media (max-width: 640px) {
+  .sqa-admin {
+    padding: 22px 14px 50px;
+  }
+
+  .sqa-panel {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .sqa-summary {
+    gap: 8px;
+  }
+
+  .sqa-summary-card {
+    padding: 14px 10px;
+    border-radius: 15px;
+  }
+
+  .sqa-summary-card strong {
+    font-size: 22px;
+  }
+
+  .sqa-summary-card span {
+    font-size: 10px;
+  }
+
+  .sqa-options,
+  .sqa-list-options {
+    grid-template-columns: 1fr;
+  }
+
+  .sqa-question-card {
+    padding: 15px;
+  }
+
+  .sqa-question-card-top {
+    flex-direction: column;
+  }
+
+  .sqa-form-actions button {
+    flex: 1;
+  }
+}
