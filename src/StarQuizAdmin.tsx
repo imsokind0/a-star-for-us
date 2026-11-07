@@ -24,6 +24,8 @@ type Participant = {
   created_at: string
 }
 
+const letters = ['A', 'B', 'C', 'D']
+
 export default function StarQuizAdmin() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [answers, setAnswers] = useState<Record<string, number>>({})
@@ -71,7 +73,6 @@ export default function StarQuizAdmin() {
 
     setQuestions(list)
 
-    // 관리자 전용 RPC로 정답 조회
     const answerMap: Record<string, number> = {}
 
     for (const q of list) {
@@ -103,6 +104,7 @@ export default function StarQuizAdmin() {
       is_published: false,
       is_revealed: false,
     })
+    setNotice('')
   }
 
   const editQuestion = (q: QuizQuestion) => {
@@ -252,7 +254,6 @@ export default function StarQuizAdmin() {
     await loadQuestions()
   }
 
-  // 관리자 전용 RPC로 참여자 조회
   const loadParticipants = async (questionId: string) => {
     setLoadingStats(v => ({ ...v, [questionId]: true }))
 
@@ -308,227 +309,234 @@ export default function StarQuizAdmin() {
 
   return (
     <div className="sqa-admin">
-      <div className="sqa-heading">
-        <div className="sqa-heading-icon">
-          <Sparkles size={24} />
-        </div>
-        <div>
-          <span className="sqa-eyebrow">STAR QUIZ CONTROL</span>
-          <h2>별빛 퀴즈 관리</h2>
-          <p>꾸질단과 함께할 별빛 질문을 만들어 보세요.</p>
-        </div>
-      </div>
-
-      <div className="sqa-summary">
-        <div className="sqa-summary-card">
-          <Star size={17} />
-          <span>전체 질문</span>
-          <strong>{questions.length}</strong>
-        </div>
-        <div className="sqa-summary-card">
-          <Eye size={17} />
-          <span>공개 질문</span>
-          <strong>{questions.filter(q => q.is_published).length}</strong>
-        </div>
-        <div className="sqa-summary-card">
-          <Check size={17} />
-          <span>정답 공개</span>
-          <strong>{questions.filter(q => q.is_revealed).length}</strong>
-        </div>
-      </div>
-
-      <section className="sqa-panel">
-        <div className="sqa-panel-heading">
+      {/* 상단 */}
+      <header className="sqa-editor-header">
+        <div className="sqa-editor-title">
+          <div className="sqa-editor-title-icon">
+            <Sparkles size={23} />
+          </div>
           <div>
-            <span className="sqa-eyebrow">
-              {form.id ? 'EDIT CONSTELLATION' : 'CREATE CONSTELLATION'}
-            </span>
-            <h3>{form.id ? '질문 수정하기' : '새로운 별빛 질문'}</h3>
-          </div>
-          <div className="sqa-heading-badge">
-            <Sparkles size={16} />
-            {form.id ? 'EDIT' : 'NEW'}
+            <span className="sqa-eyebrow">STAR QUIZ CONTROL</span>
+            <h2>별빛 퀴즈 관리</h2>
+            <p>꾸질단과 함께할 별빛 질문을 만들어 보세요.</p>
           </div>
         </div>
+        <div className="sqa-editor-header-decoration">✦ ✧</div>
+      </header>
 
-        <form className="sqa-form" onSubmit={saveQuestion}>
-          <div className="sqa-field">
-            <label htmlFor="sqa-question">질문 내용</label>
+      {/* 요약 */}
+      <div className="sqa-editor-overview">
+        <div className="sqa-overview-item">
+          <span className="sqa-overview-icon"><Star size={17} /></span>
+          <div><small>전체 질문</small><strong>{questions.length}</strong></div>
+        </div>
+        <div className="sqa-overview-item">
+          <span className="sqa-overview-icon"><Eye size={17} /></span>
+          <div><small>공개 질문</small><strong>{questions.filter(q => q.is_published).length}</strong></div>
+        </div>
+        <div className="sqa-overview-item">
+          <span className="sqa-overview-icon"><Check size={17} /></span>
+          <div><small>정답 공개</small><strong>{questions.filter(q => q.is_revealed).length}</strong></div>
+        </div>
+      </div>
+
+      {/* 작성 */}
+      <section className="sqa-editor-panel">
+        <div className="sqa-editor-panel-heading">
+          <div>
+            <span className="sqa-eyebrow">{form.id ? 'EDIT QUESTION' : 'NEW QUESTION'}</span>
+            <h3>{form.id ? '질문 수정하기' : '새로운 별빛 질문'}</h3>
+            <p>질문과 네 가지 선택지를 작성해 주세요.</p>
+          </div>
+          <span className="sqa-editor-mode">{form.id ? '수정 중' : '새 질문'}</span>
+        </div>
+
+        <form className="sqa-editor-form" onSubmit={saveQuestion}>
+          {/* 질문 */}
+          <div className="sqa-editor-field">
+            <div className="sqa-editor-label">
+              <span className="sqa-editor-step">01</span>
+              <label htmlFor="sqa-question">질문 내용</label>
+              <span className="sqa-editor-hint">QUIZ QUESTION</span>
+            </div>
             <textarea
               id="sqa-question"
+              className="sqa-editor-question-input"
               value={form.question}
               onChange={e => setForm(v => ({ ...v, question: e.target.value }))}
-              placeholder="꾸질단에게 물어볼 질문을 입력해 주세요..."
-              rows={3}
+              placeholder="꾸질단에게 물어볼 질문을 입력해 주세요."
+              rows={4}
               required
             />
           </div>
 
-          <div className="sqa-field">
-            <div className="sqa-label-row">
-              <label>선택지 4개</label>
-              <span>정답으로 지정할 카드를 선택하세요.</span>
+          {/* 선택지 */}
+          <div className="sqa-editor-field">
+            <div className="sqa-editor-label">
+              <span className="sqa-editor-step">02</span>
+              <label>선택지</label>
+              <span className="sqa-editor-hint">CHOOSE THE ANSWER</span>
             </div>
+            <p className="sqa-editor-description">정답으로 지정할 선택지의 별 버튼을 눌러 주세요.</p>
 
-            <div className="sqa-options">
+            <div className="sqa-editor-options">
               {form.options.map((option, i) => (
-                <label
+                <div
                   key={i}
-                  className={`sqa-option ${form.correct_option === i ? 'is-correct' : ''}`}
+                  className={`sqa-editor-option ${form.correct_option === i ? 'selected' : ''}`}
                 >
-                  <span className="sqa-option-top">
-                    <span className="sqa-option-letter">
-                      {String.fromCharCode(65 + i)}
-                    </span>
+                  <div className="sqa-editor-option-head">
+                    <span className="sqa-editor-option-letter">{letters[i]}</span>
                     {form.correct_option === i && (
-                      <span className="sqa-correct-chip">
-                        <Check size={12} /> 정답
-                      </span>
+                      <span className="sqa-editor-answer-badge"><Check size={12} /> 정답</span>
                     )}
-                  </span>
+                  </div>
                   <input
                     value={option}
                     onChange={e =>
                       setForm(v => ({
                         ...v,
-                        options: v.options.map((o, j) =>
-                          j === i ? e.target.value : o
-                        ),
+                        options: v.options.map((o, j) => j === i ? e.target.value : o),
                       }))
                     }
-                    placeholder={`선택지 ${i + 1}을 입력해 주세요`}
+                    placeholder={`${letters[i]} 선택지 내용을 입력해 주세요`}
+                    aria-label={`${letters[i]} 선택지`}
                     required
                   />
-                  <span className="sqa-option-select">
-                    <input
-                      type="radio"
-                      name="correct-option"
-                      checked={form.correct_option === i}
-                      onChange={() => setForm(v => ({ ...v, correct_option: i }))}
-                    />
-                    정답으로 선택
-                  </span>
-                </label>
+                  <button
+                    type="button"
+                    className={`sqa-editor-answer-button ${form.correct_option === i ? 'active' : ''}`}
+                    onClick={() => setForm(v => ({ ...v, correct_option: i }))}
+                  >
+                    <Star size={15} fill={form.correct_option === i ? 'currentColor' : 'none'} />
+                    {form.correct_option === i ? '정답으로 지정됨' : '정답으로 지정'}
+                  </button>
+                </div>
               ))}
             </div>
           </div>
 
-          <div className="sqa-field">
-            <label htmlFor="sqa-explanation">정답 해설</label>
+          {/* 해설 */}
+          <div className="sqa-editor-field">
+            <div className="sqa-editor-label">
+              <span className="sqa-editor-step">03</span>
+              <label htmlFor="sqa-explanation">정답 해설</label>
+              <span className="sqa-editor-hint">EXPLANATION</span>
+            </div>
             <textarea
               id="sqa-explanation"
+              className="sqa-editor-explanation-input"
               value={form.explanation}
               onChange={e => setForm(v => ({ ...v, explanation: e.target.value }))}
-              placeholder="정답 공개 후 보여줄 해설을 입력해 주세요..."
-              rows={3}
+              placeholder="정답 공개 후 보여줄 해설을 작성해 주세요. (선택 사항)"
+              rows={4}
             />
           </div>
 
-          <div className="sqa-setting-box">
-            <label className="sqa-switch-row">
-              <span className="sqa-switch-icon"><Eye size={17} /></span>
-              <span className="sqa-switch-text">
-                <strong>문제 공개</strong>
-                <small>시청자가 퀴즈에 참여할 수 있어요.</small>
-              </span>
-              <input
-                type="checkbox"
-                checked={form.is_published}
-                onChange={e => setForm(v => ({ ...v, is_published: e.target.checked }))}
-              />
-              <span className="sqa-switch-ui" />
-            </label>
+          {/* 설정 */}
+          <div className="sqa-editor-field">
+            <div className="sqa-editor-label">
+              <span className="sqa-editor-step">04</span>
+              <label>공개 설정</label>
+              <span className="sqa-editor-hint">VISIBILITY</span>
+            </div>
 
-            <label className="sqa-switch-row">
-              <span className="sqa-switch-icon"><Sparkles size={17} /></span>
-              <span className="sqa-switch-text">
-                <strong>정답 공개</strong>
-                <small>정답과 해설을 시청자에게 보여줘요.</small>
-              </span>
-              <input
-                type="checkbox"
-                checked={form.is_revealed}
-                onChange={e => setForm(v => ({ ...v, is_revealed: e.target.checked }))}
-              />
-              <span className="sqa-switch-ui" />
-            </label>
+            <div className="sqa-editor-settings">
+              <label className={`sqa-editor-setting ${form.is_published ? 'on' : ''}`}>
+                <span className="sqa-editor-setting-icon"><Eye size={18} /></span>
+                <span className="sqa-editor-setting-copy">
+                  <strong>문제 공개</strong>
+                  <small>시청자가 퀴즈에 참여할 수 있어요.</small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={form.is_published}
+                  onChange={e => setForm(v => ({ ...v, is_published: e.target.checked }))}
+                />
+                <span className="sqa-editor-toggle" />
+              </label>
+
+              <label className={`sqa-editor-setting ${form.is_revealed ? 'on' : ''}`}>
+                <span className="sqa-editor-setting-icon"><Sparkles size={18} /></span>
+                <span className="sqa-editor-setting-copy">
+                  <strong>정답 공개</strong>
+                  <small>정답과 해설을 시청자에게 보여줘요.</small>
+                </span>
+                <input
+                  type="checkbox"
+                  checked={form.is_revealed}
+                  onChange={e => setForm(v => ({ ...v, is_revealed: e.target.checked }))}
+                />
+                <span className="sqa-editor-toggle" />
+              </label>
+            </div>
           </div>
 
-          <div className="sqa-form-actions">
-            <button className="sqa-primary-button" type="submit" disabled={saving}>
-              <Save size={16} />
-              {saving ? '저장 중...' : form.id ? '수정 내용 저장' : '별빛 질문 등록'}
-            </button>
-
-            {form.id && (
-              <button type="button" className="sqa-secondary-button" onClick={resetForm}>
-                <X size={16} /> 수정 취소
+          {/* 저장 */}
+          <div className="sqa-editor-submit-area">
+            <div className="sqa-editor-submit-copy">
+              <Sparkles size={15} />
+              <span>{form.id ? '수정한 내용을 저장해 주세요.' : '새로운 별빛 질문을 등록해 주세요.'}</span>
+            </div>
+            <div className="sqa-editor-submit-buttons">
+              <button className="sqa-editor-save" type="submit" disabled={saving}>
+                <Save size={16} />
+                {saving ? '저장 중...' : form.id ? '수정 내용 저장' : '별빛 질문 등록'}
               </button>
-            )}
+              {form.id && (
+                <button type="button" className="sqa-editor-cancel" onClick={resetForm}>
+                  <X size={16} /> 수정 취소
+                </button>
+              )}
+            </div>
           </div>
 
           {notice && (
-            <div className="sqa-notice">
-              <Sparkles size={15} />
-              {notice}
+            <div className="sqa-editor-notice">
+              <Sparkles size={16} />
+              <span>{notice}</span>
             </div>
           )}
         </form>
       </section>
 
-      <section className="sqa-panel sqa-list-panel">
-        <div className="sqa-panel-heading">
+      {/* 목록 */}
+      <section className="sqa-editor-panel sqa-editor-list-panel">
+        <div className="sqa-editor-panel-heading">
           <div>
             <span className="sqa-eyebrow">YOUR CONSTELLATIONS</span>
-            <h3>등록된 질문 <span className="sqa-count">{questions.length}</span></h3>
+            <h3>등록된 질문 <span className="sqa-editor-count">{questions.length}</span></h3>
+            <p>등록한 질문과 참여 통계를 관리할 수 있어요.</p>
           </div>
-          <div className="sqa-heading-badge">
-            <Star size={16} /> LIST
-          </div>
+          <span className="sqa-editor-mode"><Star size={14} /> LIST</span>
         </div>
 
         {loading ? (
-          <div className="sqa-empty">
-            <Sparkles size={25} />
-            <p>별빛 질문을 불러오는 중...</p>
-          </div>
+          <div className="sqa-editor-empty"><RefreshCw size={23} /><p>별빛 질문을 불러오는 중...</p></div>
         ) : questions.length === 0 ? (
-          <div className="sqa-empty">
-            <Star size={28} />
-            <p>아직 등록된 질문이 없어요.</p>
-            <span>첫 번째 별빛 질문을 만들어 보세요.</span>
-          </div>
+          <div className="sqa-editor-empty"><Star size={26} /><p>아직 등록된 질문이 없어요.</p><span>첫 번째 별빛 질문을 만들어 보세요.</span></div>
         ) : (
-          <div className="sqa-question-list">
+          <div className="sqa-editor-question-list">
             {questions.map((q, i) => {
               const stats = getStats(q)
               const isExpanded = !!expanded[q.id]
 
               return (
-                <article className="sqa-question-card" key={q.id}>
-                  <div className="sqa-question-card-top">
-                    <span className="sqa-question-number">
-                      <Star size={12} /> QUESTION {String(i + 1).padStart(2, '0')}
-                    </span>
-                    <div className="sqa-statuses">
-                      <span className={q.is_published ? 'published' : ''}>
-                        {q.is_published ? '공개 중' : '비공개'}
-                      </span>
-                      <span className={q.is_revealed ? 'revealed' : ''}>
-                        {q.is_revealed ? '정답 공개' : '정답 미공개'}
-                      </span>
+                <article className="sqa-editor-question-card" key={q.id}>
+                  <div className="sqa-editor-question-top">
+                    <span className="sqa-editor-question-number">✦ QUESTION {String(i + 1).padStart(2, '0')}</span>
+                    <div className="sqa-editor-statuses">
+                      <span className={q.is_published ? 'published' : ''}>{q.is_published ? '공개 중' : '비공개'}</span>
+                      <span className={q.is_revealed ? 'revealed' : ''}>{q.is_revealed ? '정답 공개' : '정답 미공개'}</span>
                     </div>
                   </div>
 
                   <h4>{q.question}</h4>
 
-                  <div className="sqa-list-options">
+                  <div className="sqa-editor-list-options">
                     {q.options.map((o, j) => (
-                      <div
-                        className={`sqa-list-option ${answers[q.id] === j ? 'correct' : ''}`}
-                        key={j}
-                      >
-                        <span>{String.fromCharCode(65 + j)}</span>
+                      <div className={`sqa-editor-list-option ${answers[q.id] === j ? 'correct' : ''}`} key={j}>
+                        <span>{letters[j]}</span>
                         <p>{o}</p>
                         {answers[q.id] === j && <Check size={14} />}
                       </div>
@@ -536,13 +544,10 @@ export default function StarQuizAdmin() {
                   </div>
 
                   {q.explanation && (
-                    <div className="sqa-list-explanation">
-                      <Sparkles size={14} />
-                      <p>{q.explanation}</p>
-                    </div>
+                    <div className="sqa-editor-list-explanation"><Sparkles size={14} /><p>{q.explanation}</p></div>
                   )}
 
-                  <div className="sqa-question-actions">
+                  <div className="sqa-editor-question-actions">
                     <button type="button" onClick={() => togglePublished(q)}>
                       {q.is_published ? <EyeOff size={14} /> : <Eye size={14} />}
                       {q.is_published ? '비공개 전환' : '문제 공개'}
@@ -551,107 +556,56 @@ export default function StarQuizAdmin() {
                       {q.is_revealed ? <EyeOff size={14} /> : <Eye size={14} />}
                       {q.is_revealed ? '정답 숨기기' : '정답 공개'}
                     </button>
-                    <button type="button" onClick={() => editQuestion(q)}>
-                      <Pencil size={14} /> 수정
-                    </button>
-                    <button type="button" className="delete" onClick={() => deleteQuestion(q.id)}>
-                      <Trash2 size={14} /> 삭제
-                    </button>
+                    <button type="button" onClick={() => editQuestion(q)}><Pencil size={14} /> 수정</button>
+                    <button type="button" className="delete" onClick={() => deleteQuestion(q.id)}><Trash2 size={14} /> 삭제</button>
                   </div>
 
-                  {/* 통계 열기 */}
-                  <button
-                    type="button"
-                    className="sqa-primary-button"
-                    style={{ marginTop: 14, width: '100%' }}
-                    onClick={() => toggleStats(q.id)}
-                  >
-                    <Users size={16} />
-                    {isExpanded ? '참여 통계 접기' : '참여 통계 및 참여자 보기'}
+                  <button type="button" className="sqa-editor-stats-button" onClick={() => toggleStats(q.id)}>
+                    <span><Users size={16} /> 참여 통계 및 참여자 보기</span>
                     {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
 
                   {isExpanded && (
-                    <div className="sqa-stats-area">
+                    <div className="sqa-editor-stats">
                       {loadingStats[q.id] ? (
-                        <div className="sqa-empty">
-                          <RefreshCw size={20} />
-                          <p>참여 통계를 불러오는 중...</p>
-                        </div>
+                        <div className="sqa-editor-empty"><RefreshCw size={20} /><p>참여 통계를 불러오는 중...</p></div>
                       ) : (
                         <>
-                          <div className="sqa-summary">
-                            <div className="sqa-summary-card">
-                              <Users size={17} />
-                              <span>참여 인원</span>
-                              <strong>{stats.total}</strong>
-                            </div>
-                            <div className="sqa-summary-card">
-                              <Trophy size={17} />
-                              <span>정답자</span>
-                              <strong>{stats.correctCount}</strong>
-                            </div>
-                            <div className="sqa-summary-card">
-                              <Check size={17} />
-                              <span>정답률</span>
-                              <strong>
-                                {stats.total > 0
-                                  ? `${stats.accuracy.toFixed(1)}%`
-                                  : '-'}
-                              </strong>
-                            </div>
+                          <div className="sqa-editor-stat-cards">
+                            <div><Users size={16} /><small>참여 인원</small><strong>{stats.total}</strong></div>
+                            <div><Trophy size={16} /><small>정답자</small><strong>{stats.correctCount}</strong></div>
+                            <div><Check size={16} /><small>정답률</small><strong>{stats.total > 0 ? `${stats.accuracy.toFixed(1)}%` : '-'}</strong></div>
                           </div>
 
                           <h5>선택지별 득표</h5>
                           {q.options.map((option, index) => {
                             const count = stats.optionCounts[index] || 0
-                            const percent = stats.total > 0
-                              ? (count / stats.total) * 100
-                              : 0
+                            const percent = stats.total > 0 ? (count / stats.total) * 100 : 0
 
                             return (
-                              <div className="sqa-vote-stat" key={index}>
-                                <div className="sqa-vote-stat-top">
-                                  <span>
-                                    {String.fromCharCode(65 + index)}. {option}
-                                    {answers[q.id] === index && (
-                                      <strong> · 정답</strong>
-                                    )}
-                                  </span>
-                                  <span>
-                                    {count}명 · {percent.toFixed(1)}%
-                                  </span>
+                              <div className="sqa-editor-vote-stat" key={index}>
+                                <div className="sqa-editor-vote-top">
+                                  <span>{letters[index]}. {option}{answers[q.id] === index && <strong> · 정답</strong>}</span>
+                                  <span>{count}명 · {percent.toFixed(1)}%</span>
                                 </div>
-                                <div className="sqa-vote-bar">
-                                  <div style={{ width: `${percent}%` }} />
-                                </div>
+                                <div className="sqa-editor-vote-bar"><div style={{ width: `${percent}%` }} /></div>
                               </div>
                             )
                           })}
 
                           <h5>참여자 목록</h5>
                           {stats.total === 0 ? (
-                            <p className="sqa-empty">아직 참여자가 없어요.</p>
+                            <p className="sqa-editor-no-participants">아직 참여자가 없어요.</p>
                           ) : (
-                            <div className="sqa-participant-list">
+                            <div className="sqa-editor-participants">
                               {participants[q.id].map((p, index) => {
                                 const selected = Number(p.selected_option)
                                 const isCorrect = answers[q.id] === selected
 
                                 return (
-                                  <div className="sqa-participant" key={`${p.voter_id}-${index}`}>
-                                    <div>
-                                      <strong>{p.nickname || '이름 없음'}</strong>
-                                      <small>
-                                        {p.created_at
-                                          ? new Date(p.created_at).toLocaleString('ko-KR')
-                                          : ''}
-                                      </small>
-                                    </div>
-                                    <span className={isCorrect ? 'correct' : ''}>
-                                      {String.fromCharCode(65 + selected)}번 선택
-                                      {isCorrect && <Check size={13} />}
-                                    </span>
+                                  <div className="sqa-editor-participant" key={`${p.voter_id}-${index}`}>
+                                    <div><strong>{p.nickname || '이름 없음'}</strong><small>{p.created_at ? new Date(p.created_at).toLocaleString('ko-KR') : ''}</small></div>
+                                    <span className={isCorrect ? 'correct' : ''}>{letters[selected] || '?'} 선택 {isCorrect && <Check size={13} />}</span>
                                   </div>
                                 )
                               })}
