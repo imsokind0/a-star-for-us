@@ -1,0 +1,46 @@
+
+.drawing-box {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 15px;
+}
+
+.drawing-tools {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.drawing-color {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,.5);
+  cursor: pointer;
+}
+
+.drawing-tools input {
+  width: 100px;
+}
+
+.drawing-tools button:not(.drawing-color) {
+  background: transparent;
+  border: 1px solid rgba(226,197,230,.3);
+  border-radius: 20px;
+  padding: 7px 12px;
+  color: #e6b1d2;
+  cursor: pointer;
+}
+
+.drawing-box canvas {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 1;
+  background: #160d27;
+  border: 1px solid rgba(226,197,230,.3);
+  border-radius: 15px;
+  touch-action: none;
+  cursor: crosshair;
+}
