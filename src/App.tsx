@@ -1,4 +1,3 @@
-
 import { useEffect, useState, type FormEvent } from 'react'
 import {
   ArrowLeft,
@@ -17,6 +16,7 @@ import { hasSupabase, supabase } from './lib/supabase'
 import DrawingCanvas from './DrawingCanvas'
 import StarEffects from './StarEffects'
 import StarQuiz from './StarQuiz'
+import StarQuizAdmin from './StarQuizAdmin'
 
 type Page = 'home' | 'mailbox' | 'memories' | 'secret' | 'quiz' | 'admin'
 
@@ -841,6 +841,7 @@ function App() {
 
               {!hasSupabase && <p className="notice">Supabase 연결을 설정해야 관리 기능을 사용할 수 있어요.</p>}
 
+              {/* STAR QUIZ ADMIN: 관리자 퀴즈 컴포넌트 연결 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
@@ -848,7 +849,8 @@ function App() {
                     <h3>별빛 퀴즈 관리</h3>
                   </div>
                 </div>
-                <StarQuiz isAdmin={true}/>
+
+                <StarQuizAdmin />
               </section>
 
               <section className="admin-section">
