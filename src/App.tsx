@@ -1188,3 +1188,4 @@ function App() {
 }
 
 export default App
+import DrawingCanvas from './DrawingCanvas'
