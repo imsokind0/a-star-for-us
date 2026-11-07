@@ -16,8 +16,9 @@ import {
 import { hasSupabase, supabase } from './lib/supabase'
 import DrawingCanvas from './DrawingCanvas'
 import StarEffects from './StarEffects'
+import StarQuiz from './StarQuiz'
 
-type Page = 'home' | 'mailbox' | 'memories' | 'secret' | 'admin'
+type Page = 'home' | 'mailbox' | 'memories' | 'secret' | 'quiz' | 'admin'
 
 type Memory = {
   id: string
@@ -158,7 +159,11 @@ function Countdown() {
 
 function App() {
   const [page, setPage] = useState<Page>(
-    location.pathname.endsWith('/admin') ? 'admin' : 'home'
+    location.pathname.endsWith('/admin')
+      ? 'admin'
+      : location.pathname.endsWith('/quiz')
+        ? 'quiz'
+        : 'home'
   )
 
   const [memories, setMemories] = useState<Memory[]>(sampleMemories)
@@ -309,6 +314,8 @@ function App() {
 
     if (p === 'admin') {
       history.pushState({}, '', `${base}/admin` || '/admin')
+    } else if (p === 'quiz') {
+      history.pushState({}, '', `${base}/quiz`)
     } else {
       history.pushState({}, '', base ? `${base}/` : '/')
     }
@@ -574,7 +581,9 @@ function App() {
         ? '우리의 추억'
         : page === 'secret'
           ? '시크릿 커버'
-          : ''
+          : page === 'quiz'
+            ? '별빛 퀴즈'
+            : ''
 
   return (
     <div className={showMeteorShower ? 'celebration-mode' : ''}>
@@ -605,6 +614,13 @@ function App() {
           onClick={() => nav('secret')}
         >
           SECRET COVER✧
+        </button>
+
+        <button
+          className={page === 'quiz' ? 'active' : ''}
+          onClick={() => nav('quiz')}
+        >
+          STAR QUIZ
         </button>
       </header>
 
@@ -649,6 +665,13 @@ function App() {
               <p>아직은 비밀인 선물 하나 ✦</p>
               <ArrowRight/>
             </button>
+
+            <button className="home-card" onClick={() => nav('quiz')}>
+              <small>STAR QUIZ</small>
+              <strong>별빛 퀴즈</strong>
+              <p>뽀실애기에 대한 기억을 별 카드로 맞혀봐요</p>
+              <ArrowRight/>
+            </button>
           </section>
 
           <footer className="home-footer">
@@ -666,7 +689,9 @@ function App() {
                 ? 'STARRY MAILBOX'
                 : page === 'memories'
                   ? 'MEMORIES'
-                  : 'SECRET COVER'}
+                  : page === 'secret'
+                    ? 'SECRET COVER'
+                    : 'STAR QUIZ'}
             </div>
 
             <h2>{title}</h2>
@@ -676,9 +701,16 @@ function App() {
                 ? '꾸질이의 마음을 별빛 편지로 전해 주세요.'
                 : page === 'memories'
                   ? '하나하나 이어져 별자리가 된 순간들'
-                  : '뽀실애기가 꾸질이들에게 준비한 작은 선물.'}
+                  : page === 'secret'
+                    ? '뽀실애기가 꾸질이들에게 준비한 작은 선물.'
+                    : '별 카드를 선택하고 뽀실애기에 대한 기억을 맞혀봐요.'}
             </p>
           </div>
+
+          {/* STAR QUIZ */}
+          {page === 'quiz' && (
+            <StarQuiz isAdmin={isAdmin}/>
+          )}
 
           {page === 'mailbox' && (
             <form className="letter-form" onSubmit={submitLetter}>
@@ -936,6 +968,18 @@ function App() {
                   Supabase 연결을 설정해야 관리 기능을 사용할 수 있어요.
                 </p>
               )}
+
+              {/* STAR QUIZ 관리 */}
+              <section className="admin-section">
+                <div className="admin-title">
+                  <div>
+                    <div className="eyebrow">STAR QUIZ</div>
+                    <h3>별빛 퀴즈 관리</h3>
+                  </div>
+                </div>
+
+                <StarQuiz isAdmin={true}/>
+              </section>
 
               {/* 도착한 편지 관리 */}
               <section className="admin-section">
