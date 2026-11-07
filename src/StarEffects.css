@@ -1,0 +1,43 @@
+
+.cursor-star {
+  position: fixed;
+  z-index: 99999;
+  pointer-events: none;
+  color: #f6c9e7;
+  font-size: 13px;
+  text-shadow:
+    0 0 5px rgba(255, 210, 245, .9),
+    0 0 12px rgba(230, 177, 210, .8);
+  transform: translate(-50%, -50%);
+  animation: cursorStarFade .6s ease-out forwards;
+}
+
+.burst-star {
+  font-size: 19px;
+  animation: burstStar .8s ease-out forwards;
+}
+
+@keyframes cursorStarFade {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(.2) rotate(90deg);
+  }
+}
+
+@keyframes burstStar {
+  0% {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(.5);
+  }
+  100% {
+    opacity: 0;
+    transform:
+      translate(calc(-50% + var(--dx)), calc(-50% + var(--dy)))
+      scale(1.5)
+      rotate(180deg);
+  }
+}
