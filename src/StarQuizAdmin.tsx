@@ -1,16 +1,9 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
 import {
-  Plus,
-  Pencil,
-  Trash2,
-  Eye,
-  EyeOff,
-  Save,
-  X,
-  Sparkles,
-  Check,
-  Star,
+  Plus, Pencil, Trash2, Eye, EyeOff, Save, X,
+  Sparkles, Check, Star, Users, Trophy, ChevronDown,
+  ChevronUp, RefreshCw,
 } from 'lucide-react'
 import { supabase, hasSupabase } from './lib/supabase'
 
@@ -24,14 +17,19 @@ type QuizQuestion = {
   order_index: number
 }
 
-type QuizAnswer = {
-  question_id: string
-  correct_option: number
+type Participant = {
+  nickname: string
+  selected_option: number
+  voter_id: string
+  created_at: string
 }
 
 export default function StarQuizAdmin() {
   const [questions, setQuestions] = useState<QuizQuestion[]>([])
   const [answers, setAnswers] = useState<Record<string, number>>({})
+  const [participants, setParticipants] = useState<Record<string, Participant[]>>({})
+  const [loadingStats, setLoadingStats] = useState<Record<string, boolean>>({})
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({})
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [notice, setNotice] = useState('')
@@ -73,15 +71,19 @@ export default function StarQuizAdmin() {
 
     setQuestions(list)
 
-    const { data: answerData } = await supabase
-      .from('quiz_answers')
-      .select('question_id, correct_option')
-
+    // 관리자 전용 RPC로 정답 조회
     const answerMap: Record<string, number> = {}
 
-    ;(answerData || []).forEach((a: QuizAnswer) => {
-      answerMap[a.question_id] = a.correct_option
-    })
+    for (const q of list) {
+      const { data: answer, error: answerError } = await supabase
+        .rpc('quiz_question_answer', {
+          p_question_id: q.id,
+        })
+
+      if (!answerError && answer !== null && answer !== undefined) {
+        answerMap[q.id] = Number(answer)
+      }
+    }
 
     setAnswers(answerMap)
     setLoading(false)
@@ -101,7 +103,6 @@ export default function StarQuizAdmin() {
       is_published: false,
       is_revealed: false,
     })
-    setNotice('')
   }
 
   const editQuestion = (q: QuizQuestion) => {
@@ -213,6 +214,12 @@ export default function StarQuizAdmin() {
       return
     }
 
+    setParticipants(v => {
+      const next = { ...v }
+      delete next[id]
+      return next
+    })
+
     setNotice('문제를 삭제했어요.')
     await loadQuestions()
   }
@@ -243,6 +250,60 @@ export default function StarQuizAdmin() {
     }
 
     await loadQuestions()
+  }
+
+  // 관리자 전용 RPC로 참여자 조회
+  const loadParticipants = async (questionId: string) => {
+    setLoadingStats(v => ({ ...v, [questionId]: true }))
+
+    const { data, error } = await supabase
+      .rpc('quiz_admin_participants', {
+        p_question_id: questionId,
+      })
+
+    if (error) {
+      setNotice(`참여자 조회 실패: ${error.message}`)
+      setLoadingStats(v => ({ ...v, [questionId]: false }))
+      return
+    }
+
+    setParticipants(v => ({
+      ...v,
+      [questionId]: (data || []) as Participant[],
+    }))
+
+    setLoadingStats(v => ({ ...v, [questionId]: false }))
+  }
+
+  const toggleStats = async (questionId: string) => {
+    const isOpen = !!expanded[questionId]
+
+    setExpanded(v => ({ ...v, [questionId]: !isOpen }))
+
+    if (!isOpen && !participants[questionId]) {
+      await loadParticipants(questionId)
+    }
+  }
+
+  const getStats = (q: QuizQuestion) => {
+    const voters = participants[q.id] || []
+    const total = voters.length
+    const correct = answers[q.id]
+
+    const optionCounts = q.options.map((_, index) =>
+      voters.filter(v => Number(v.selected_option) === index).length
+    )
+
+    const correctCount = correct === undefined
+      ? 0
+      : voters.filter(v => Number(v.selected_option) === correct).length
+
+    return {
+      total,
+      optionCounts,
+      correctCount,
+      accuracy: total > 0 ? (correctCount / total) * 100 : 0,
+    }
   }
 
   return (
@@ -439,62 +500,170 @@ export default function StarQuizAdmin() {
           </div>
         ) : (
           <div className="sqa-question-list">
-            {questions.map((q, i) => (
-              <article className="sqa-question-card" key={q.id}>
-                <div className="sqa-question-card-top">
-                  <span className="sqa-question-number">
-                    <Star size={12} /> QUESTION {String(i + 1).padStart(2, '0')}
-                  </span>
-                  <div className="sqa-statuses">
-                    <span className={q.is_published ? 'published' : ''}>
-                      {q.is_published ? '공개 중' : '비공개'}
-                    </span>
-                    <span className={q.is_revealed ? 'revealed' : ''}>
-                      {q.is_revealed ? '정답 공개' : '정답 미공개'}
-                    </span>
-                  </div>
-                </div>
+            {questions.map((q, i) => {
+              const stats = getStats(q)
+              const isExpanded = !!expanded[q.id]
 
-                <h4>{q.question}</h4>
-
-                <div className="sqa-list-options">
-                  {q.options.map((o, j) => (
-                    <div
-                      className={`sqa-list-option ${answers[q.id] === j ? 'correct' : ''}`}
-                      key={j}
-                    >
-                      <span>{String.fromCharCode(65 + j)}</span>
-                      <p>{o}</p>
-                      {answers[q.id] === j && <Check size={14} />}
+              return (
+                <article className="sqa-question-card" key={q.id}>
+                  <div className="sqa-question-card-top">
+                    <span className="sqa-question-number">
+                      <Star size={12} /> QUESTION {String(i + 1).padStart(2, '0')}
+                    </span>
+                    <div className="sqa-statuses">
+                      <span className={q.is_published ? 'published' : ''}>
+                        {q.is_published ? '공개 중' : '비공개'}
+                      </span>
+                      <span className={q.is_revealed ? 'revealed' : ''}>
+                        {q.is_revealed ? '정답 공개' : '정답 미공개'}
+                      </span>
                     </div>
-                  ))}
-                </div>
-
-                {q.explanation && (
-                  <div className="sqa-list-explanation">
-                    <Sparkles size={14} />
-                    <p>{q.explanation}</p>
                   </div>
-                )}
 
-                <div className="sqa-question-actions">
-                  <button type="button" onClick={() => togglePublished(q)}>
-                    {q.is_published ? <EyeOff size={14} /> : <Eye size={14} />}
-                    {q.is_published ? '비공개 전환' : '문제 공개'}
+                  <h4>{q.question}</h4>
+
+                  <div className="sqa-list-options">
+                    {q.options.map((o, j) => (
+                      <div
+                        className={`sqa-list-option ${answers[q.id] === j ? 'correct' : ''}`}
+                        key={j}
+                      >
+                        <span>{String.fromCharCode(65 + j)}</span>
+                        <p>{o}</p>
+                        {answers[q.id] === j && <Check size={14} />}
+                      </div>
+                    ))}
+                  </div>
+
+                  {q.explanation && (
+                    <div className="sqa-list-explanation">
+                      <Sparkles size={14} />
+                      <p>{q.explanation}</p>
+                    </div>
+                  )}
+
+                  <div className="sqa-question-actions">
+                    <button type="button" onClick={() => togglePublished(q)}>
+                      {q.is_published ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {q.is_published ? '비공개 전환' : '문제 공개'}
+                    </button>
+                    <button type="button" onClick={() => toggleRevealed(q)}>
+                      {q.is_revealed ? <EyeOff size={14} /> : <Eye size={14} />}
+                      {q.is_revealed ? '정답 숨기기' : '정답 공개'}
+                    </button>
+                    <button type="button" onClick={() => editQuestion(q)}>
+                      <Pencil size={14} /> 수정
+                    </button>
+                    <button type="button" className="delete" onClick={() => deleteQuestion(q.id)}>
+                      <Trash2 size={14} /> 삭제
+                    </button>
+                  </div>
+
+                  {/* 통계 열기 */}
+                  <button
+                    type="button"
+                    className="sqa-primary-button"
+                    style={{ marginTop: 14, width: '100%' }}
+                    onClick={() => toggleStats(q.id)}
+                  >
+                    <Users size={16} />
+                    {isExpanded ? '참여 통계 접기' : '참여 통계 및 참여자 보기'}
+                    {isExpanded ? <ChevronUp size={16} /> : <ChevronDown size={16} />}
                   </button>
-                  <button type="button" onClick={() => toggleRevealed(q)}>
-                    {q.is_revealed ? <EyeOff size={14} /> : <Eye size={14} />}
-                    {q.is_revealed ? '정답 숨기기' : '정답 공개'}
-                  </button>
-                  <button type="button" onClick={() => editQuestion(q)}>
-                    <Pencil size={14} /> 수정
-                  </button>
-                  <button type="button" className="delete" onClick={() => deleteQuestion(q.id)}>
-                    <Trash2 size={14} /> 삭제
-                  </button>
-                </div>
-              </article>
-            ))}
+
+                  {isExpanded && (
+                    <div className="sqa-stats-area">
+                      {loadingStats[q.id] ? (
+                        <div className="sqa-empty">
+                          <RefreshCw size={20} />
+                          <p>참여 통계를 불러오는 중...</p>
+                        </div>
+                      ) : (
+                        <>
+                          <div className="sqa-summary">
+                            <div className="sqa-summary-card">
+                              <Users size={17} />
+                              <span>참여 인원</span>
+                              <strong>{stats.total}</strong>
+                            </div>
+                            <div className="sqa-summary-card">
+                              <Trophy size={17} />
+                              <span>정답자</span>
+                              <strong>{stats.correctCount}</strong>
+                            </div>
+                            <div className="sqa-summary-card">
+                              <Check size={17} />
+                              <span>정답률</span>
+                              <strong>
+                                {stats.total > 0
+                                  ? `${stats.accuracy.toFixed(1)}%`
+                                  : '-'}
+                              </strong>
+                            </div>
+                          </div>
+
+                          <h5>선택지별 득표</h5>
+                          {q.options.map((option, index) => {
+                            const count = stats.optionCounts[index] || 0
+                            const percent = stats.total > 0
+                              ? (count / stats.total) * 100
+                              : 0
+
+                            return (
+                              <div className="sqa-vote-stat" key={index}>
+                                <div className="sqa-vote-stat-top">
+                                  <span>
+                                    {String.fromCharCode(65 + index)}. {option}
+                                    {answers[q.id] === index && (
+                                      <strong> · 정답</strong>
+                                    )}
+                                  </span>
+                                  <span>
+                                    {count}명 · {percent.toFixed(1)}%
+                                  </span>
+                                </div>
+                                <div className="sqa-vote-bar">
+                                  <div style={{ width: `${percent}%` }} />
+                                </div>
+                              </div>
+                            )
+                          })}
+
+                          <h5>참여자 목록</h5>
+                          {stats.total === 0 ? (
+                            <p className="sqa-empty">아직 참여자가 없어요.</p>
+                          ) : (
+                            <div className="sqa-participant-list">
+                              {participants[q.id].map((p, index) => {
+                                const selected = Number(p.selected_option)
+                                const isCorrect = answers[q.id] === selected
+
+                                return (
+                                  <div className="sqa-participant" key={`${p.voter_id}-${index}`}>
+                                    <div>
+                                      <strong>{p.nickname || '이름 없음'}</strong>
+                                      <small>
+                                        {p.created_at
+                                          ? new Date(p.created_at).toLocaleString('ko-KR')
+                                          : ''}
+                                      </small>
+                                    </div>
+                                    <span className={isCorrect ? 'correct' : ''}>
+                                      {String.fromCharCode(65 + selected)}번 선택
+                                      {isCorrect && <Check size={13} />}
+                                    </span>
+                                  </div>
+                                )
+                              })}
+                            </div>
+                          )}
+                        </>
+                      )}
+                    </div>
+                  )}
+                </article>
+              )
+            })}
           </div>
         )}
       </section>
