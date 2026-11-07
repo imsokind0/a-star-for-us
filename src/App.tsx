@@ -14,6 +14,7 @@ import {
   Pencil
 } from 'lucide-react'
 import { hasSupabase, supabase } from './lib/supabase'
+import DrawingCanvas from './DrawingCanvas'
 
 type Page = 'home' | 'mailbox' | 'memories' | 'secret' | 'admin'
 
@@ -42,6 +43,7 @@ type Letter = {
   q4: string | null
   q5: string | null
   letter: string
+  drawing_data: string | null
   created_at: string
 }
 
@@ -311,6 +313,7 @@ function App() {
     }
   }
 
+  /* 별빛 편지 저장 */
   const submitLetter = async (e: FormEvent) => {
     e.preventDefault()
 
@@ -327,10 +330,12 @@ function App() {
         q3: answers[2] || null,
         q4: answers[3] || null,
         q5: answers[4] || null,
-        letter: letter.trim()
+        letter: letter.trim(),
+        drawing_data: drawingData || null
       })
 
       if (error) {
+        console.error('편지 저장 오류:', error)
         setNotice('편지를 보내지 못했어요. 잠시 후 다시 시도해 주세요.')
         return
       }
@@ -340,6 +345,7 @@ function App() {
     setNickname('')
     setAnswers(['', '', '', '', ''])
     setLetter('')
+    setDrawingData('')
   }
 
   const login = async (e: FormEvent) => {
@@ -674,7 +680,7 @@ function App() {
             <form className="letter-form" onSubmit={submitLetter}>
               <div className="form-card">
                 <label>닉네임 <b>*</b></label>
-                <small>뺏실애기가 알아볼 수 있는 닉네임</small>
+                <small>뽀실애기가 알아볼 수 있는 닉네임</small>
 
                 <input
                   value={nickname}
@@ -708,19 +714,45 @@ function App() {
 
               <div className="form-card">
                 <label>
-                  <span className="number">06</span> 1주년을 맞아 뺏실애기에게 전하고 싶은 편지 <b>*</b>
+                  <span className="number">06</span> 1주년을 맞아 뽀실애기에게 전하고 싶은 편지 <b>*</b>
                 </label>
 
-                <small>사랑하는 뺏실애기에게...</small>
+                <small>사랑하는 뽀실애기에게...</small>
 
                 <textarea
                   className="long-letter"
                   value={letter}
                   onChange={e => setLetter(e.target.value)}
-                  placeholder="사랑하는 뺏실애기에게..."
+                  placeholder="사랑하는 뽀실애기에게..."
                   required
                   rows={5}
                 />
+
+                {/* 편지 그림판 */}
+                <DrawingCanvas
+                  onSave={(data) => {
+                    setDrawingData(data)
+                    setNotice('그림이 저장되었어요!')
+                  }}
+                />
+
+                {/* 저장한 그림 미리보기 */}
+                {drawingData && (
+                  <div className="drawing-preview">
+                    <p>편지에 함께 보낼 그림 ✦</p>
+                    <img
+                      src={drawingData}
+                      alt="편지 그림 미리보기"
+                    />
+                    <button
+                      type="button"
+                      className="text-button"
+                      onClick={() => setDrawingData('')}
+                    >
+                      그림 첨부 취소
+                    </button>
+                  </div>
+                )}
               </div>
 
               <button className="pink-button" type="submit">
@@ -901,6 +933,7 @@ function App() {
                 </p>
               )}
 
+              {/* 도착한 편지 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
@@ -952,12 +985,24 @@ function App() {
                           <b>1주년 편지</b>
                           <p>{l.letter}</p>
                         </div>
+
+                        {/* 꾸질이가 그린 그림 표시 */}
+                        {l.drawing_data && (
+                          <div className="answer letter-drawing">
+                            <b>꾸질이가 그린 그림</b>
+                            <img
+                              src={l.drawing_data}
+                              alt={`${l.nickname}의 편지 그림`}
+                            />
+                          </div>
+                        )}
                       </article>
                     ))}
                   </div>
                 )}
               </section>
 
+              {/* 추억 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
@@ -1081,6 +1126,7 @@ function App() {
                 </div>
               </section>
 
+              {/* 시크릿 영상 관리 */}
               <section className="admin-section">
                 <div className="admin-title">
                   <div>
@@ -1189,4 +1235,3 @@ function App() {
 }
 
 export default App
-import DrawingCanvas from './DrawingCanvas'
