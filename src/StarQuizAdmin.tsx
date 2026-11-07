@@ -1,6 +1,17 @@
 
 import { useEffect, useState, type FormEvent } from 'react'
-import { Plus, Pencil, Trash2, Eye, EyeOff, Save, X } from 'lucide-react'
+import {
+  Plus,
+  Pencil,
+  Trash2,
+  Eye,
+  EyeOff,
+  Save,
+  X,
+  Sparkles,
+  Check,
+  Star,
+} from 'lucide-react'
 import { supabase, hasSupabase } from './lib/supabase'
 
 type QuizQuestion = {
@@ -90,6 +101,7 @@ export default function StarQuizAdmin() {
       is_published: false,
       is_revealed: false,
     })
+    setNotice('')
   }
 
   const editQuestion = (q: QuizQuestion) => {
@@ -234,156 +246,251 @@ export default function StarQuizAdmin() {
   }
 
   return (
-    <div className="star-quiz-admin">
-      <section className="admin-section">
-        <div className="admin-title">
+    <div className="sqa-admin">
+      <div className="sqa-heading">
+        <div className="sqa-heading-icon">
+          <Sparkles size={24} />
+        </div>
+        <div>
+          <span className="sqa-eyebrow">STAR QUIZ CONTROL</span>
+          <h2>별빛 퀴즈 관리</h2>
+          <p>꾸질단과 함께할 별빛 질문을 만들어 보세요.</p>
+        </div>
+      </div>
+
+      <div className="sqa-summary">
+        <div className="sqa-summary-card">
+          <Star size={17} />
+          <span>전체 질문</span>
+          <strong>{questions.length}</strong>
+        </div>
+        <div className="sqa-summary-card">
+          <Eye size={17} />
+          <span>공개 질문</span>
+          <strong>{questions.filter(q => q.is_published).length}</strong>
+        </div>
+        <div className="sqa-summary-card">
+          <Check size={17} />
+          <span>정답 공개</span>
+          <strong>{questions.filter(q => q.is_revealed).length}</strong>
+        </div>
+      </div>
+
+      <section className="sqa-panel">
+        <div className="sqa-panel-heading">
           <div>
-            <div className="eyebrow">STAR QUIZ</div>
-            <h3>{form.id ? '문제 수정' : '새로운 문제 등록'}</h3>
+            <span className="sqa-eyebrow">
+              {form.id ? 'EDIT CONSTELLATION' : 'CREATE CONSTELLATION'}
+            </span>
+            <h3>{form.id ? '질문 수정하기' : '새로운 별빛 질문'}</h3>
+          </div>
+          <div className="sqa-heading-badge">
+            <Sparkles size={16} />
+            {form.id ? 'EDIT' : 'NEW'}
           </div>
         </div>
 
-        <form className="admin-form" onSubmit={saveQuestion}>
-          <label>질문</label>
-          <textarea
-            value={form.question}
-            onChange={e => setForm(v => ({ ...v, question: e.target.value }))}
-            placeholder="퀴즈 질문을 입력해 주세요."
-            rows={3}
-            required
-          />
-
-          <label>선택지 4개</label>
-
-          {form.options.map((option, i) => (
-            <input
-              key={i}
-              value={option}
-              onChange={e =>
-                setForm(v => ({
-                  ...v,
-                  options: v.options.map((o, j) => j === i ? e.target.value : o),
-                }))
-              }
-              placeholder={`선택지 ${i + 1}`}
+        <form className="sqa-form" onSubmit={saveQuestion}>
+          <div className="sqa-field">
+            <label htmlFor="sqa-question">질문 내용</label>
+            <textarea
+              id="sqa-question"
+              value={form.question}
+              onChange={e => setForm(v => ({ ...v, question: e.target.value }))}
+              placeholder="꾸질단에게 물어볼 질문을 입력해 주세요..."
+              rows={3}
               required
             />
-          ))}
-
-          <label>정답 선택</label>
-          <div className="quiz-answer-select">
-            {form.options.map((option, i) => (
-              <label key={i}>
-                <input
-                  type="radio"
-                  name="correct-option"
-                  checked={form.correct_option === i}
-                  onChange={() => setForm(v => ({ ...v, correct_option: i }))}
-                />
-                {String.fromCharCode(65 + i)}. {option || `선택지 ${i + 1}`}
-              </label>
-            ))}
           </div>
 
-          <label>정답 해설</label>
-          <textarea
-            value={form.explanation}
-            onChange={e => setForm(v => ({ ...v, explanation: e.target.value }))}
-            placeholder="정답 공개 후 보여줄 해설"
-            rows={3}
-          />
+          <div className="sqa-field">
+            <div className="sqa-label-row">
+              <label>선택지 4개</label>
+              <span>정답으로 지정할 카드를 선택하세요.</span>
+            </div>
 
-          <div className="quiz-admin-checks">
-            <label>
+            <div className="sqa-options">
+              {form.options.map((option, i) => (
+                <label
+                  key={i}
+                  className={`sqa-option ${form.correct_option === i ? 'is-correct' : ''}`}
+                >
+                  <span className="sqa-option-top">
+                    <span className="sqa-option-letter">
+                      {String.fromCharCode(65 + i)}
+                    </span>
+                    {form.correct_option === i && (
+                      <span className="sqa-correct-chip">
+                        <Check size={12} /> 정답
+                      </span>
+                    )}
+                  </span>
+                  <input
+                    value={option}
+                    onChange={e =>
+                      setForm(v => ({
+                        ...v,
+                        options: v.options.map((o, j) =>
+                          j === i ? e.target.value : o
+                        ),
+                      }))
+                    }
+                    placeholder={`선택지 ${i + 1}을 입력해 주세요`}
+                    required
+                  />
+                  <span className="sqa-option-select">
+                    <input
+                      type="radio"
+                      name="correct-option"
+                      checked={form.correct_option === i}
+                      onChange={() => setForm(v => ({ ...v, correct_option: i }))}
+                    />
+                    정답으로 선택
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <div className="sqa-field">
+            <label htmlFor="sqa-explanation">정답 해설</label>
+            <textarea
+              id="sqa-explanation"
+              value={form.explanation}
+              onChange={e => setForm(v => ({ ...v, explanation: e.target.value }))}
+              placeholder="정답 공개 후 보여줄 해설을 입력해 주세요..."
+              rows={3}
+            />
+          </div>
+
+          <div className="sqa-setting-box">
+            <label className="sqa-switch-row">
+              <span className="sqa-switch-icon"><Eye size={17} /></span>
+              <span className="sqa-switch-text">
+                <strong>문제 공개</strong>
+                <small>시청자가 퀴즈에 참여할 수 있어요.</small>
+              </span>
               <input
                 type="checkbox"
                 checked={form.is_published}
                 onChange={e => setForm(v => ({ ...v, is_published: e.target.checked }))}
               />
-              문제 공개
+              <span className="sqa-switch-ui" />
             </label>
 
-            <label>
+            <label className="sqa-switch-row">
+              <span className="sqa-switch-icon"><Sparkles size={17} /></span>
+              <span className="sqa-switch-text">
+                <strong>정답 공개</strong>
+                <small>정답과 해설을 시청자에게 보여줘요.</small>
+              </span>
               <input
                 type="checkbox"
                 checked={form.is_revealed}
                 onChange={e => setForm(v => ({ ...v, is_revealed: e.target.checked }))}
               />
-              정답 공개
+              <span className="sqa-switch-ui" />
             </label>
           </div>
 
-          <div className="quiz-admin-buttons">
-            <button className="pink-button" type="submit" disabled={saving}>
-              <Save size={15}/>
-              {saving ? '저장 중...' : form.id ? '수정 저장' : '문제 등록'}
+          <div className="sqa-form-actions">
+            <button className="sqa-primary-button" type="submit" disabled={saving}>
+              <Save size={16} />
+              {saving ? '저장 중...' : form.id ? '수정 내용 저장' : '별빛 질문 등록'}
             </button>
 
             {form.id && (
-              <button type="button" className="outline-button" onClick={resetForm}>
-                <X size={15}/> 수정 취소
+              <button type="button" className="sqa-secondary-button" onClick={resetForm}>
+                <X size={16} /> 수정 취소
               </button>
             )}
           </div>
 
-          {notice && <p className="notice">{notice}</p>}
+          {notice && (
+            <div className="sqa-notice">
+              <Sparkles size={15} />
+              {notice}
+            </div>
+          )}
         </form>
       </section>
 
-      <section className="admin-section">
-        <div className="admin-title">
+      <section className="sqa-panel sqa-list-panel">
+        <div className="sqa-panel-heading">
           <div>
-            <div className="eyebrow">QUESTION LIST</div>
-            <h3>등록된 문제 <span>{questions.length}</span></h3>
+            <span className="sqa-eyebrow">YOUR CONSTELLATIONS</span>
+            <h3>등록된 질문 <span className="sqa-count">{questions.length}</span></h3>
+          </div>
+          <div className="sqa-heading-badge">
+            <Star size={16} /> LIST
           </div>
         </div>
 
         {loading ? (
-          <p className="empty">문제를 불러오는 중...</p>
+          <div className="sqa-empty">
+            <Sparkles size={25} />
+            <p>별빛 질문을 불러오는 중...</p>
+          </div>
         ) : questions.length === 0 ? (
-          <p className="empty">아직 등록된 문제가 없어요.</p>
+          <div className="sqa-empty">
+            <Star size={28} />
+            <p>아직 등록된 질문이 없어요.</p>
+            <span>첫 번째 별빛 질문을 만들어 보세요.</span>
+          </div>
         ) : (
-          <div className="quiz-admin-list">
+          <div className="sqa-question-list">
             {questions.map((q, i) => (
-              <article className="quiz-admin-item" key={q.id}>
-                <div className="quiz-admin-item-head">
-                  <span className="quiz-admin-number">Q{i + 1}</span>
-                  <strong>{q.question}</strong>
+              <article className="sqa-question-card" key={q.id}>
+                <div className="sqa-question-card-top">
+                  <span className="sqa-question-number">
+                    <Star size={12} /> QUESTION {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <div className="sqa-statuses">
+                    <span className={q.is_published ? 'published' : ''}>
+                      {q.is_published ? '공개 중' : '비공개'}
+                    </span>
+                    <span className={q.is_revealed ? 'revealed' : ''}>
+                      {q.is_revealed ? '정답 공개' : '정답 미공개'}
+                    </span>
+                  </div>
                 </div>
 
-                <ol type="A">
+                <h4>{q.question}</h4>
+
+                <div className="sqa-list-options">
                   {q.options.map((o, j) => (
-                    <li key={j}>
-                      {o}
-                      {answers[q.id] === j && <b className="quiz-correct-label">정답</b>}
-                    </li>
+                    <div
+                      className={`sqa-list-option ${answers[q.id] === j ? 'correct' : ''}`}
+                      key={j}
+                    >
+                      <span>{String.fromCharCode(65 + j)}</span>
+                      <p>{o}</p>
+                      {answers[q.id] === j && <Check size={14} />}
+                    </div>
                   ))}
-                </ol>
-
-                {q.explanation && <p className="quiz-admin-explanation">{q.explanation}</p>}
-
-                <div className="quiz-admin-status">
-                  <span>{q.is_published ? '공개 중' : '비공개'}</span>
-                  <span>{q.is_revealed ? '정답 공개됨' : '정답 비공개'}</span>
                 </div>
 
-                <div className="quiz-admin-actions">
-                  <button type="button" onClick={() => togglePublished(q)}>
-                    {q.is_published ? <EyeOff size={14}/> : <Eye size={14}/>}
-                    {q.is_published ? '비공개' : '공개'}
-                  </button>
+                {q.explanation && (
+                  <div className="sqa-list-explanation">
+                    <Sparkles size={14} />
+                    <p>{q.explanation}</p>
+                  </div>
+                )}
 
+                <div className="sqa-question-actions">
+                  <button type="button" onClick={() => togglePublished(q)}>
+                    {q.is_published ? <EyeOff size={14} /> : <Eye size={14} />}
+                    {q.is_published ? '비공개 전환' : '문제 공개'}
+                  </button>
                   <button type="button" onClick={() => toggleRevealed(q)}>
-                    {q.is_revealed ? <EyeOff size={14}/> : <Eye size={14}/>}
+                    {q.is_revealed ? <EyeOff size={14} /> : <Eye size={14} />}
                     {q.is_revealed ? '정답 숨기기' : '정답 공개'}
                   </button>
-
                   <button type="button" onClick={() => editQuestion(q)}>
-                    <Pencil size={14}/> 수정
+                    <Pencil size={14} /> 수정
                   </button>
-
-                  <button type="button" onClick={() => deleteQuestion(q.id)}>
-                    <Trash2 size={14}/> 삭제
+                  <button type="button" className="delete" onClick={() => deleteQuestion(q.id)}>
+                    <Trash2 size={14} /> 삭제
                   </button>
                 </div>
               </article>
